@@ -1,0 +1,525 @@
+GRAMMAR ESSENTIALS - Understanding How Structure Reveals Meaning
+
+Analyze the grammar of {passage} to help anyone understand how sentence structure reveals theological truth—accessible to all, grounded in scholarship.
+
+═══════════════════════════════════════════════════
+
+LANGUAGE AUTO-DETECTION:
+
+**If passage is Old Testament:**
+- Display Hebrew text with transliteration
+- Analyze Hebrew grammatical features
+- Explain Hebrew word order, construct chains, verb stems
+- Note definiteness, pronominal suffixes, particles
+- Reference Hebrew syntax and style
+
+**If passage is New Testament:**
+- Display Greek text with transliteration
+- Analyze Greek grammatical features  
+- Explain Greek word order, cases, moods, aspects
+- Note article usage, particles, connecting words
+- Reference Greek syntax and style
+
+**Always:**
+- Provide English translation alongside original
+- Explain technical terms in plain English
+- Connect grammar to theological meaning
+- Show why these grammatical choices matter
+
+═══════════════════════════════════════════════════
+
+OUTPUT STRUCTURE:
+
+**BEGIN EVERY ANALYSIS WITH:**
+
+**🔑 KEY GRAMMATICAL INSIGHT** (2-3 sentences)
+[One clear paragraph that captures the most important grammatical discovery and its theological significance—the "bottom line" readers can take away even if they read nothing else]
+
+Then proceed with full analysis:
+
+═══════════════════════════════════════════════════
+
+ANALYZE THROUGH 5 ESSENTIAL QUESTIONS:
+
+For each verse in {passage}, work through these questions systematically:
+
+═══════════════════════════════════════════════════
+
+**QUESTION 1: WHO'S DOING WHAT?**
+(Understanding Actors, Actions, and Recipients)
+
+**Original Language:**
+[Hebrew/Greek text]
+[Transliteration if helpful]
+[English translation]
+
+**Identify the core elements:**
+
+• **Subject** (Who is acting?)
+  - Named or implied?
+  - Singular or plural?
+  - Human, divine, or other?
+
+• **Verb** (What action?)
+  - **Hebrew**: Identify stem (Qal, Niphal, Piel, Hiphil, etc.) and significance
+    - Qal = simple action
+    - Niphal = passive/reflexive
+    - Piel = intensive/factitive
+    - Hiphil = causative
+    - Explain why THIS stem matters
+  
+  - **Greek**: Identify tense-aspect and significance
+    - Present = ongoing/repeated (imperfective)
+    - Aorist = whole/complete (perfective)
+    - Perfect = completed with ongoing results (stative)
+    - Explain why THIS aspect matters
+
+  - **Voice**: Active (subject acts) / Passive (subject receives) / Middle (subject participates/benefits)
+
+• **Object/Complement** (Who/what receives action or completes meaning?)
+  - Direct object?
+  - Predicate nominative/adjective?
+
+**Grammatical Significance:**
+→ How does identifying the actor/action/recipient clarify meaning?
+→ What would change if any element were different?
+
+**Theological Insight:**
+→ What does this reveal about God, humanity, or how we should live?
+→ How does this grammar affect our response to the text?
+
+**Application:**
+→ What does this mean for the reader today?
+
+─────────────────────────────────────────────────
+
+**QUESTION 2: IS THIS A STATEMENT, COMMAND, OR QUESTION?**
+(Understanding Sentence Type and Communicative Force)
+
+**Identify the sentence type:**
+
+• **Statement/Declaration** (asserts truth)
+  - Indicative mood (Greek) or Perfect/Qal statement (Hebrew)
+  - Example: "God created the heavens and the earth"
+  - Function: Establishes reality, informs the reader
+  - Response: Believe it, align life with this truth
+
+• **Command/Imperative** (demands action)
+  - Imperative mood (Greek) or Imperative form (Hebrew)
+  - Example: "Let your light shine before others"
+  - Function: Requires volitional response and obedience
+  - Response: Obey, act accordingly
+
+• **Question/Interrogative** (seeks response or makes rhetorical point)
+  - Interrogative structure with question particle
+  - Example: "How shall its saltiness be restored?"
+  - Types:
+    - **Genuine question**: Seeks information
+    - **Rhetorical question**: Makes point through implied answer
+  - Function: Engages mind, provokes thought, emphasizes point
+  - Response: Think deeply, answer thoughtfully, grasp the point
+
+**Grammatical Details:**
+
+• **Hebrew specifics:**
+  - Question markers: הֲ (ha), מִי (who), מָה (what), etc.
+  - Imperatives: Note person, number
+  - Statements: Note verb conjugation (perfect/imperfect)
+
+• **Greek specifics:**
+  - Interrogatives: τίς (who), τί (what), πῶς (how)
+  - Imperatives: Note person, number, aspect
+  - Statements: Note mood (indicative = reality)
+
+**Why Sentence Type Matters:**
+→ Different types demand different responses
+→ Grammar shows author's communicative intent
+→ Misidentifying type leads to misapplication
+
+**Theological Impact:**
+→ What is God doing through this sentence type?
+→ What response does this grammar demand from us?
+
+─────────────────────────────────────────────────
+
+**QUESTION 3: WHAT CONDITIONS OR PURPOSES ARE STATED?**
+(Understanding If/Then Logic and Intended Goals)
+
+Look for:
+
+**A. CONDITIONAL STATEMENTS** ("If X, then Y")
+
+• **Hebrew conditionals:**
+  - אִם (im) = if
+  - Types: Real conditions vs. hypothetical
+  - Protasis (if-clause) and apodosis (then-clause)
+
+• **Greek conditionals:**
+  - εἰ (ei) / ἐάν (ean) = if
+  - Four classes:
+    - **First Class**: Assumes reality for argument's sake ("if, and it's true...")
+    - **Second Class**: Contrary to fact ("if, but it's not...")
+    - **Third Class**: Possible/probable future ("if, and it might be...")
+    - **Fourth Class**: Remote possibility (rare in NT)
+
+**For each condition:**
+- What's the condition (protasis)?
+- What's the result (apodosis)?
+- Is this real, hypothetical, or contrary to fact?
+- What does the condition type reveal about probability/reality?
+
+**B. PURPOSE STATEMENTS** ("so that..." / "in order that...")
+
+• **Hebrew purpose:**
+  - לְ (le) + infinitive = "in order to"
+  - Purpose clauses show divine or human intention
+
+• **Greek purpose:**
+  - ἵνα (hina) / ὅπως (hopos) = "so that"
+  - Purpose vs. result: Intended goal vs. actual outcome
+
+**For each purpose:**
+- What's the stated goal?
+- Whose purpose? (God's? Human's?)
+- How does knowing the purpose affect interpretation?
+- What does this reveal about divine intentions?
+
+**Theological Weight:**
+→ Conditions reveal what depends on what
+→ Purpose reveals God's goals and plans
+→ Both show cause-and-effect in God's economy
+
+**Application:**
+→ How do conditions affect our responsibility?
+→ How do purposes guide our actions?
+
+─────────────────────────────────────────────────
+
+**QUESTION 4: WHAT TIMING MATTERS?**
+(Understanding Temporal Markers and Their Significance)
+
+Identify time indicators:
+
+**Hebrew temporal markers:**
+• **בְּ (be)** = in/when/at (with time reference)
+• **עַד (ad)** = until
+• **אַחֲרֵי (acharei)** = after
+• **לִפְנֵי (lifnei)** = before
+• **עַתָּה (atah)** = now
+
+**Greek temporal markers:**
+• **ἕως (heos)** = until
+• **ὅτε (hote)** = when
+• **πρίν (prin)** = before
+• **μετά (meta)** = after
+• **νῦν (nun)** = now
+
+**For each time marker:**
+
+**When does this happen?**
+- Past, present, or future?
+- Specific moment or ongoing period?
+- Before/after what other event?
+
+**How long does it last?**
+- Temporary or permanent?
+- Until what endpoint?
+- Bounded or unbounded?
+
+**What changes when time is complete?**
+- Does a condition end?
+- Does something new begin?
+- What's the transition point?
+
+**Theological Significance:**
+→ Timing reveals God's schedule and sovereignty
+→ "Until" clauses show duration and endpoints
+→ "Now" vs. "then" shows already/not yet tension
+→ Temporary vs. eternal matters for hope and endurance
+
+**Application:**
+→ How does timing affect our obedience?
+→ What should we do now vs. later?
+→ How long should we persevere?
+
+─────────────────────────────────────────────────
+
+**QUESTION 5: WHAT'S BEING EMPHASIZED?**
+(Understanding Word Order, Articles, and Highlighting)
+
+Look for emphasis through:
+
+**A. WORD ORDER**
+
+• **Hebrew word order:**
+  - Normal: Verb-Subject-Object (VSO)
+  - Emphasis: Subject-Verb-Object (fronting subject)
+  - Or: Object-Verb-Subject (fronting object)
+  - **Fronted elements** = emphasized elements
+
+• **Greek word order:**
+  - Flexible word order for emphasis
+  - Normal: Subject-Verb-Object
+  - **Fronted elements** = emphasized
+  - **Delayed elements** = climactic
+
+**For unusual word order:**
+- What element is placed first/last?
+- Why does author want us to focus here?
+- What's the rhetorical effect?
+
+**B. ARTICLE USAGE**
+
+• **Hebrew definiteness:**
+  - ה (ha) = the definite article
+  - **With article**: Specific, known, unique
+  - **Without article**: General, quality, characteristic
+  - Construct chains create definiteness
+
+• **Greek articles:**
+  - ὁ, ἡ, τό = the
+  - **Articular** (with article): Definite, specific, previously mentioned
+  - **Anarthrous** (no article): Quality, characteristic, indefinite
+  - Special uses: Substantizing adjectives, indicating subject
+
+**For each significant noun:**
+- Does it have the article?
+- If yes: What makes it definite/unique/specific?
+- If no: What quality/characteristic is emphasized?
+- How does presence/absence change meaning?
+
+**Example Impact:**
+- "You are light" (quality emphasized)
+- "You are THE light" (unique identity emphasized)
+
+**C. REPETITION AND PARALLELISM**
+
+• **Hebrew parallelism:**
+  - Synonymous (says same thing differently)
+  - Antithetic (says opposite for contrast)
+  - Synthetic (second line builds on first)
+
+• **Greek repetition:**
+  - Repeated words/roots show emphasis
+  - Anaphora (repetition at beginning)
+  - Epistrophe (repetition at end)
+
+**Theological Emphasis:**
+→ What truth is highlighted by emphasis?
+→ What does God want us to see clearly?
+→ Where should our attention focus?
+
+**Application:**
+→ What priority does this emphasis reveal?
+→ How should this focus shape our lives?
+
+═══════════════════════════════════════════════════
+
+FINAL SECTION FOR EACH VERSE:
+
+**💡 GRAMMAR REVEALS:**
+
+[Write one rich paragraph (4-6 sentences) that:
+- Synthesizes the key grammatical observations
+- Shows how structure serves theological meaning
+- Connects grammar to the reader's life and faith
+- Captures the spiritual depth and transformative power
+- Makes clear why this grammatical analysis matters for worship, obedience, and understanding God]
+
+═══════════════════════════════════════════════════
+
+COMPLETE EXAMPLE (showing the depth and style to maintain):
+
+**Genesis 1:1**
+
+**🔑 KEY GRAMMATICAL INSIGHT:**
+The opening word order—beginning with a time phrase rather than the subject—creates temporal framing that makes everything that follows subordinate to this cosmic moment. God isn't introduced until the second word, forcing readers to first contemplate the reality of "beginning" before meeting the One who creates. This grammar establishes that creation isn't timeless or eternal—it has a starting point, and God precedes it.
+
+---
+
+**ORIGINAL LANGUAGE:**
+
+**Hebrew Text:** בְּרֵאשִׁית בָּרָא אֱלֹהִים אֵת הַשָּׁמַיִם וְאֵת הָאָרֶץ
+**Transliteration:** Bereshit bara Elohim et hashamayim ve'et ha'aretz
+**Translation:** "In the beginning, God created the heavens and the earth"
+
+---
+
+**QUESTION 1: WHO'S DOING WHAT?**
+
+**Subject:** אֱלֹהִים (Elohim) = God
+- Plural form with singular verb (bara)
+- Signals majesty and fullness of divine nature
+- Not introduced until second word (delayed for emphasis on "beginning")
+
+**Verb:** בָּרָ֣א (bara) = created
+- Qal perfect, 3rd masculine singular
+- **Stem significance**: Qal = simple action, not intensive or causative
+  - Used exclusively of divine creation in Scripture
+  - Never used with human subjects—this is God's unique activity
+- **Perfect aspect**: Completed action viewed as a whole
+  - Not ongoing or repeated—this is THE creative act
+  - Historic perfect: narrates past completed event
+
+**Object:** אֵת הַשָּׁמַיִם וְאֵת הָאָרֶץ = the heavens and the earth
+- Direct object marker אֵת (et) marks definite objects
+- **With definite article (ה)**: "THE heavens and THE earth"
+  - Not "some heavens" but THE totality
+  - Merism (two extremes = everything in between)
+  - All reality is in view
+
+**Grammatical Significance:**
+The verb בָּרָא (bara) standing between God and the cosmos shows God as the active agent bridging transcendence and creation. The object marker אֵת plus definite article emphasizes that everything—absolutely everything—came into being through this divine act.
+
+**Theological Insight:**
+God is the sole creator. The Qal stem (not causative) shows God creating directly, not through intermediaries. The perfect aspect indicates this isn't an ongoing process—creation is a completed divine act that established everything. God precedes creation, acts upon nothing to make something, and the result encompasses all reality.
+
+**Application:**
+If God created everything ex nihilo, nothing in our lives exists outside His creative authority. Our identity, purpose, and existence are grounded in this Creator-God, not in ourselves.
+
+---
+
+**QUESTION 2: IS THIS A STATEMENT, COMMAND, OR QUESTION?**
+
+**Sentence Type:** Declarative Statement
+- Hebrew perfect verb in historical narrative
+- Makes a factual assertion about reality
+- Not command, not question—states what happened
+
+**Function:** Establishes foundational truth
+- Everything that follows depends on this assertion
+- Provides the theological foundation for all Scripture
+- Declares reality that readers must accept and align with
+
+**Response Required:** Belief and worship
+- Believe this is how reality began
+- Worship the God who created everything
+- Ground your worldview in this Creator-God
+
+**Why This Matters:**
+The declarative mood means this isn't mythological speculation or poetic imagination—Hebrew grammar presents this as historical fact. The author asserts: "This is what happened." Our response can't be indifference; we must either believe or deny.
+
+**Theological Impact:**
+God doesn't invite debate about creation—He declares it. The statement form carries divine authority. We're not asked to help create or to approve of creation; we're informed that it happened by God's sovereign act.
+
+---
+
+**QUESTION 3: WHAT CONDITIONS OR PURPOSES ARE STATED?**
+
+**No explicit conditionals or purpose clauses in this verse.**
+
+However, the verse functions as the **ground** for everything that follows:
+- All creation narratives depend on this starting point
+- All theology presupposes God as creator
+- All commands rest on Creator-creation distinction
+
+**Implied Purpose:**
+Though not grammatically stated here, the act of creation implies purpose—God created for a reason (revealed in subsequent verses: His image, His glory, human relationship with Him).
+
+---
+
+**QUESTION 4: WHAT TIMING MATTERS?**
+
+**Temporal Marker:** בְּרֵאשִׁית (bereshit) = "In the beginning"
+- Construct form: בְּ (in) + רֵאשִׁית (beginning)
+- **Fronted for emphasis**: Placed first in the sentence
+- Sets temporal frame for all that follows
+
+**When:** Absolute beginning
+- Not "in A beginning" but "in THE beginning"
+- Before this moment, only God existed
+- This marks the inception of time, space, matter
+
+**Duration:** This is the starting point, not an ongoing process
+- Perfect verb indicates completed action
+- Creation week follows, but THIS act initiates everything
+
+**What Changes:**
+- Before: Only God
+- After: God + Creation
+- Transition: From non-existence to existence
+
+**Theological Significance:**
+By fronting the time phrase, Hebrew grammar forces us to contemplate the reality of "beginning" before introducing God. Time has a starting point. The universe isn't eternal. There was a "before" when only God existed, and an "after" when creation existed. This destroys any notion of eternal matter or cyclical cosmologies—reality began at a specific point by divine act.
+
+**Application:**
+If creation has a beginning, it will have an end. If God preceded creation, He transcends it. We live within time, but our Creator doesn't. This shapes how we think about eternity, judgment, and new creation.
+
+---
+
+**QUESTION 5: WHAT'S BEING EMPHASIZED?**
+
+**Word Order Analysis:**
+
+**Standard Hebrew narrative word order:** Verb-Subject-Object (VSO)
+**Genesis 1:1 actual order:** בְּרֵאשִׁית (temporal phrase) - בָּרָא (verb) - אֱלֹהִים (subject) - אֵת הַשָּׁמַיִם וְאֵת הָאָרֶץ (object)
+
+**Emphasis #1: Temporal phrase fronted**
+- Unusual to begin with time marker rather than verb or subject
+- Forces reader to contemplate "beginning" first
+- Sets everything in temporal framework
+- Emphasizes that creation has a starting point
+
+**Emphasis #2: Subject delayed**
+- God isn't introduced until second word (after verb)
+- Creates dramatic effect: action before actor
+- Highlights the act of creation before revealing the Creator
+- Forces question: "Who is doing this?"
+
+**Article Usage:**
+
+**הַשָּׁמַיִם (hashamayim)** = THE heavens (definite)
+**הָאָרֶץ (ha'aretz)** = THE earth (definite)
+
+- Both nouns carry the definite article
+- Not "some heavens and earth" but "THE heavens and THE earth"
+- Totality in view—all of reality
+- Definiteness emphasizes completeness of creation
+
+**No Article on אֱלֹהִים (Elohim):**
+- Proper name doesn't need article
+- But notice the contrast: God (indefinite form) creates THE (definite) heavens and earth
+- The undefined Creator defines all creation
+
+**Repetition of אֵת (et):**
+- Direct object marker appears twice
+- Emphasizes both heavens AND earth equally
+- Nothing is secondary—all creation matters to God
+
+**Theological Emphasis:**
+The grammar emphasizes TIME first (beginning), then ACT (creating), then ACTOR (God), then SCOPE (heavens and earth). This order reveals priorities: Creation happens IN time, BY divine action, FROM God alone, ENCOMPASSING everything. The fronted temporal phrase shows creation isn't timeless or mythical—it happened at a specific point. The delayed subject builds tension: Who has such power? Answer: God alone.
+
+**Application:**
+Where we place emphasis matters. God placed temporal framing first—so we must never forget creation had a beginning and will have an end. God comes second—so we must never mistake creation for Creator. The totality of creation comes last—so we must remember nothing exists outside God's creative act.
+
+---
+
+**💡 GRAMMAR REVEALS:**
+
+The fronted temporal phrase (בְּרֵאשִׁית) establishes that creation is neither eternal nor mythical—it happened at a definite starting point in time, before which only God existed. The Qal perfect verb (בָּרָא) marks this as a completed divine act, not an ongoing process, showing that God created directly and decisively, not through intermediaries or extended evolution. The delayed introduction of the subject (אֱלֹהִים) after the verb creates dramatic tension: the act of creating is announced before the Creator is named, forcing readers to ask "Who could do this?" and answer "Only God." The double use of the definite article with direct object markers (אֵת הַשָּׁמַיִם וְאֵת הָאָרֶץ) emphasizes totality—not some things, but THE entire cosmos from highest heaven to lowest earth, meaning nothing exists outside God's creative authority. This grammatical architecture reveals that all reality, including time itself, has its source in God's sovereign creative act, grounding our existence, purpose, and hope in the One who spoke everything into being and who therefore has absolute authority over all He made—including us.
+
+═══════════════════════════════════════════════════
+
+GUIDELINES FOR MAINTAINING DEPTH AND RICHNESS:
+
+✅ **Do:**
+- Show deep engagement with the text
+- Explain grammatical choices with theological weight
+- Use specific examples from the passage
+- Connect grammar to worship, obedience, transformation
+- Make technical points accessible without dumbing down
+- Demonstrate how structure serves meaning
+- Apply insights to contemporary faith
+
+❌ **Don't:**
+- Use jargon without explanation
+- Analyze grammar without showing "so what?"
+- Stay abstract—ground everything in the specific text
+- Rush—take time to show significance
+- Separate form from theology
+
+═══════════════════════════════════════════════════
+
+Remember: Grammar is the vehicle of divine revelation. Every word order choice, every article presence or absence, every verb stem selection—these are the Spirit-inspired means by which God communicates truth. Your analysis should help readers see not just WHAT the text says, but HOW the grammar shapes the message and WHY God chose these specific structures to reveal Himself. Make grammar a doorway to deeper worship and understanding.
+
+Now analyze: {passage}

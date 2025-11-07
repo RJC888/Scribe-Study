@@ -1,0 +1,14 @@
+{
+  "name": "scribe-study-production",
+  "version": "1.0.0",
+  "description": "Professional Bible Study Application with AI Analysis",
+  "scripts": {
+    "install-backend": "cd backend && npm install",
+    "start": "cd backend && npm start",
+    "dev": "cd backend && npm run dev",
+    "deploy": "vercel --prod"
+  },
+  "keywords": ["bible", "study", "ai", "theology", "scripture"],
+  "author": "Ron Corbett",
+  "license": "COMMERCIAL"
+}
