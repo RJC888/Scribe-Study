@@ -6,7 +6,7 @@
 
 ---
 
-## 🚀 FASTEST START (5 Minutes Total)
+## 🚀 FASTEST START (5 Minutes Total) 
 
 ### 1. Get FREE Groq API Key (2 min)
 → Go to [console.groq.com](https://console.groq.com)  
