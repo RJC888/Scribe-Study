@@ -20,7 +20,10 @@ const AppState = {
         book: '',
         chapter: null,
         verse: null
-    }
+    },
+    // NEW: State for infinite scroll
+    isFetchingChapter: false,
+    currentReaderMode: false // Is the Bible reader active?
 };
 
 // ===== MODULE DEFINITIONS =====
@@ -323,8 +326,10 @@ document.addEventListener('DOMContentLoaded', () => {
     DOMElements.displayScriptureBtn = document.getElementById('displayScriptureBtn');
     DOMElements.versionSelect = document.getElementById('versionSelect');
     DOMElements.analysisDisplay = document.getElementById('analysisDisplay');
+    DOMElements.resultsMain = document.getElementById('resultsMain'); // The scrolling pane
     DOMElements.statusMessage = document.getElementById('statusMessage');
     DOMElements.analysisHeaderTemplate = document.getElementById('analysisHeaderTemplate');
+    DOMElements.scrollLoaderTemplate = document.getElementById('scrollLoaderTemplate');
     DOMElements.sidebarToggle = document.getElementById('sidebarToggle');
     DOMElements.notesPanel = document.getElementById('notesPanel');
     DOMElements.notesToggle = document.getElementById('notesToggle');
@@ -366,6 +371,9 @@ function initializeApp() {
 
     // Notes toggle
     DOMElements.notesToggle.addEventListener('click', () => DOMElements.notesPanel.classList.toggle('collapsed'));
+    
+    // --- NEW: Infinite Scroll Listener ---
+    DOMElements.resultsMain.addEventListener('scroll', handleReaderScroll);
 }
 
 // ===== API HEALTH CHECK =====
@@ -420,7 +428,7 @@ function parsePassageReference(passageStr) {
 /**
  * Main function to call the backend API.
  * @param {string} prompt - The final prompt to send to the AI.
- * @param {string} analysisType - 'module', 'scripture', or 'general'.
+ * @param {string} analysisType - 'module', 'scripture', or 'scripture-append'.
  * @param {object} context - Additional info (passage, moduleName, etc.)
  */
 async function runAnalysis(prompt, analysisType, context) {
@@ -431,8 +439,11 @@ async function runAnalysis(prompt, analysisType, context) {
     }
 
     // Show loading state
-    setLoadingState(true, 'Analyzing...');
-    DOMElements.statusMessage.classList.add('hidden');
+    // Don't show global loading for append, we'll show a local spinner
+    if (analysisType !== 'scripture-append') {
+        setLoadingState(true, 'Analyzing...');
+        DOMElements.statusMessage.classList.add('hidden');
+    }
 
     try {
         // Call BACKEND API (not Groq directly!)
@@ -456,24 +467,41 @@ async function runAnalysis(prompt, analysisType, context) {
         const data = await response.json();
         const analysis = data.analysis;
 
-        // Store version if it's a module analysis
+        // --- Handle Response Based on Type ---
         if (analysisType === 'module') {
+            // Store version
             const versionKey = `${AppState.currentCategory}-${AppState.currentModule}`;
             if (!AppState.analysisVersions[versionKey]) {
                 AppState.analysisVersions[versionKey] = [];
             }
             AppState.analysisVersions[versionKey].push(analysis);
             AppState.currentVersionIndex[versionKey] = AppState.analysisVersions[versionKey].length - 1;
-        }
+            // Display
+            displayAnalysis(analysis, analysisType, context);
 
-        // Display
-        displayAnalysis(analysis, analysisType, context);
+        } else if (analysisType === 'scripture') {
+            // This is the *first* chapter load
+            displayAnalysis(analysis, analysisType, context);
+            
+        } else if (analysisType === 'scripture-append') {
+            // This is a subsequent chapter load (scrolling)
+            appendChapter(analysis, context.direction, context);
+        }
 
     } catch (error) {
         console.error('Analysis Error:', error);
-        showError(error.message);
+        if (analysisType !== 'scripture-append') {
+            showError(error.message);
+        } else {
+            // Don't show a full-screen error, just log it
+            console.error("Failed to append chapter:", error);
+            AppState.isFetchingChapter = false;
+            hideLoadSpinners();
+        }
     } finally {
-        setLoadingState(false);
+        if (analysisType !== 'scripture-append') {
+            setLoadingState(false);
+        }
     }
 }
 
@@ -481,6 +509,7 @@ async function runAnalysis(prompt, analysisType, context) {
  * Triggered by the "Run Module Analysis" button.
  */
 function generateModuleAnalysis() {
+    AppState.currentReaderMode = false; // We are no longer in reader mode
     const passage = DOMElements.passageInput.value.trim();
     AppState.currentPassage = passage;
 
@@ -515,6 +544,7 @@ ${prompt}`;
  * This function now just parses the input and updates the state.
  */
 function displayScripture() {
+    AppState.currentReaderMode = true; // We are now in reader mode
     const passage = DOMElements.passageInput.value.trim();
     
     // Try to parse the passage
@@ -526,18 +556,18 @@ function displayScripture() {
         AppState.currentBibleReference = ref;
     } else {
         // Not a reference, maybe just a book? Or topic?
-        AppState.currentBibleReference = { book: passage, chapter: null, verse: null };
+        AppState.currentBibleReference = { book: passage, chapter: 1, verse: 1 };
     }
     
-    // Call the new function to actually fetch and display
-    fetchAndDisplayChapter();
+    // Call the function to actually fetch and display
+    fetchAndDisplayChapter(0); // 0 = initial load
 }
 
 /**
- * NEW: Fetches and displays the chapter based on AppState.currentBibleReference.
- * This is called by displayScripture() AND navigateChapter().
+ * NEW: Fetches and displays a chapter.
+ * @param {number} direction - 0 (initial), 1 (next), -1 (prev).
  */
-function fetchAndDisplayChapter() {
+function fetchAndDisplayChapter(direction = 0) {
     const { book, chapter } = AppState.currentBibleReference;
     
     if (!chapter) {
@@ -551,29 +581,147 @@ function fetchAndDisplayChapter() {
 
     const prompt = `Please provide the full text for the *entire chapter* of ${chapterQuery} using the ${versionText} version.
 Format the text with verse numbers in brackets, like [1], [2], [3], etc.
-If the input is not a specific chapter (e..g, "Genesis 1"), but a book or topic (e.g., "Genesis" or "Love"), please state that you can only display full chapters.`;
+Only provide the text, no commentary or introduction.`;
+    
+    let analysisType = 'scripture'; // Initial load
+    if (direction !== 0) {
+        analysisType = 'scripture-append';
+    }
 
-    runAnalysis(prompt, 'scripture', {
+    runAnalysis(prompt, analysisType, {
         passage: chapterQuery,
         chapter: chapterQuery,
-        version: versionText
+        version: versionText,
+        direction: direction // Pass direction to context
     });
 }
 
+
+// ===== NEW: INFINITE SCROLL =====
+
 /**
- * NEW: Handles clicks for "Prev" and "Next" chapter buttons.
+ * Handles the scroll event on the main results pane.
+ */
+function handleReaderScroll() {
+    // Only run if we are in reader mode and not already fetching
+    if (!AppState.currentReaderMode || AppState.isFetchingChapter) {
+        return;
+    }
+
+    const pane = DOMElements.resultsMain;
+    const scrollThreshold = 100; // Pixels from edge to trigger load
+
+    // Check for scrolling to the bottom
+    if (pane.scrollHeight - pane.scrollTop - pane.clientHeight < scrollThreshold) {
+        loadChapter(1); // Load next chapter
+    }
+    
+    // Check for scrolling to the top
+    if (pane.scrollTop < scrollThreshold && AppState.currentBibleReference.chapter > 1) {
+        loadChapter(-1); // Load previous chapter
+    }
+}
+
+/**
+ * Initiates loading of a new chapter.
  * @param {number} direction - 1 for next, -1 for previous.
  */
-function navigateChapter(direction) {
-    if (!AppState.currentBibleReference.chapter) return; // Should not happen
+function loadChapter(direction) {
+    if (AppState.isFetchingChapter) return; // Don't double-load
+    
+    // Don't load "Chapter 0"
+    if (direction === -1 && AppState.currentBibleReference.chapter <= 1) {
+        return;
+    }
+    
+    console.log(`Loading chapter... (Direction: ${direction})`);
+    AppState.isFetchingChapter = true;
+    
+    // Show the correct spinner
+    if (direction === 1) {
+        showLoadSpinner('bottom');
+    } else {
+        showLoadSpinner('top');
+    }
 
+    // Update state and fetch
     AppState.currentBibleReference.chapter += direction;
     
     // Update the main search bar text to reflect the new chapter
     DOMElements.passageInput.value = `${AppState.currentBibleReference.book} ${AppState.currentBibleReference.chapter}`;
     
     // Fetch the new chapter
-    fetchAndDisplayChapter();
+    fetchAndDisplayChapter(direction);
+}
+
+/**
+ * Appends a newly fetched chapter to the display.
+ * @param {string} content - The raw text/markdown from the AI.
+ * @param {number} direction - 1 for next, -1 for previous.
+ * @param {object} context - The analysis context.
+ */
+function appendChapter(content, direction, context) {
+    const contentEl = DOMElements.analysisDisplay.querySelector('.analysis-content');
+    if (!contentEl) return; // Safety check
+
+    // Create a new element for the chapter
+    const chapterDiv = document.createElement('div');
+    chapterDiv.className = 'chapter-chunk';
+    chapterDiv.innerHTML = `<h2>${context.chapter}</h2>` + formatAiResponse(content);
+
+    if (direction === 1) {
+        // Append to bottom
+        contentEl.appendChild(chapterDiv);
+    } else {
+        // Prepend to top
+        // Need to save scroll position
+        const oldScrollHeight = DOMElements.resultsMain.scrollHeight;
+        contentEl.prepend(chapterDiv);
+        const newScrollHeight = DOMElements.resultsMain.scrollHeight;
+        DOMElements.resultsMain.scrollTop += (newScrollHeight - oldScrollHeight);
+    }
+
+    // Update the sticky header to the *first* visible chapter
+    // This is a bit complex, for now, let's just update to the one we just loaded
+    const readerChapterDisplay = DOMElements.analysisDisplay.querySelector('#readerChapterDisplay');
+    if (readerChapterDisplay) {
+        readerChapterDisplay.textContent = context.chapter;
+    }
+
+    AppState.isFetchingChapter = false;
+    hideLoadSpinners();
+    console.log(`Successfully appended ${context.chapter}`);
+}
+
+/**
+ * Shows the correct scroll loader.
+ * @param {'top' | 'bottom'} position 
+ */
+function showLoadSpinner(position) {
+    hideLoadSpinners(); // Clear any existing
+    
+    const loaderTemplate = DOMElements.scrollLoaderTemplate.content.cloneNode(true);
+    const loaderEl = loaderTemplate.querySelector('.scroll-loader');
+    
+    const contentEl = DOMElements.analysisDisplay.querySelector('.analysis-content');
+
+    if (position === 'top') {
+        loaderEl.id = 'loaderTop';
+        contentEl.prepend(loaderEl);
+        loaderEl.classList.add('visible');
+    } else {
+        loaderEl.id = 'loaderBottom';
+        contentEl.append(loaderEl);
+        loaderEl.classList.add('visible');
+    }
+}
+
+/**
+ * Hides all scroll loaders.
+ */
+function hideLoadSpinners() {
+    DOMElements.analysisDisplay.querySelector('#loaderTop')?.remove();
+    DOMElements.analysisDisplay.querySelector('#loaderBottom')?.remove();
 }
 
 
@@ -589,21 +737,10 @@ function setLoadingState(isLoading, message = "Loading...") {
         DOMElements.moduleAnalysisBtn.disabled = true;
         DOMElements.moduleAnalysisBtn.innerHTML = `<span><div class="loading-dots" style="font-size: 14px; color: white;"><span>.</span><span>.</span><span>.</span></div></span> ${message}`;
         DOMElements.displayScriptureBtn.disabled = true;
-
-        // NEW: Find and disable reader buttons if they exist
-        const prevBtn = DOMElements.analysisDisplay.querySelector('#prevChapterBtn');
-        const nextBtn = DOMElements.analysisDisplay.querySelector('#nextChapterBtn');
-        if (prevBtn) prevBtn.disabled = true;
-        if (nextBtn) nextBtn.disabled = true;
-
     } else {
         DOMElements.moduleAnalysisBtn.disabled = false;
         DOMElements.moduleAnalysisBtn.innerHTML = `<span>📖</span> Run Module Analysis`;
         DOMElements.displayScriptureBtn.disabled = false;
-        
-        // NOTE: We do NOT re-enable the reader buttons here.
-        // The displayAnalysis function is responsible for setting the
-        // state of the *new* buttons it creates.
     }
 }
 
@@ -631,7 +768,7 @@ function formatAiResponse(text) {
     html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
     
     // 5. Clean up verse numbers for scripture display
-    html = html.replace(/\[(\d+)\]/g, ' <strong>[$1]</strong> ');
+    html = html.replace(/\[(\d+)\]/g, ' <strong class="verse-number">[$1]</strong> ');
 
     return html;
 }
@@ -639,7 +776,7 @@ function formatAiResponse(text) {
 /**
  * Main function to render analysis or scripture text in the display pane.
  * @param {string} content - The raw text/markdown from the AI.
- *img/ @param {string} analysisType - 'module', 'scripture', or 'general'.
+ * @param {string} analysisType - 'module' or 'scripture'.
  * @param {object} context - Additional info (passage, moduleName, etc.)
  */
 function displayAnalysis(content, analysisType, context) {
@@ -656,8 +793,6 @@ function displayAnalysis(content, analysisType, context) {
     const analysisModuleDisplay = headerEl.querySelector('#analysisModuleDisplay');
     
     const readerControlsDisplay = headerEl.querySelector('#readerControlsDisplay');
-    const prevChapterBtn = headerEl.querySelector('#prevChapterBtn');
-    const nextChapterBtn = headerEl.querySelector('#nextChapterBtn');
     const readerChapterDisplay = headerEl.querySelector('#readerChapterDisplay');
     const readerVersionDisplay = headerEl.querySelector('#readerVersionDisplay');
 
@@ -669,15 +804,6 @@ function displayAnalysis(content, analysisType, context) {
 
         readerChapterDisplay.textContent = context.chapter;
         readerVersionDisplay.textContent = context.version;
-        
-        // --- HOOK UP BUTTONS (STEP 2) ---
-        prevChapterBtn.addEventListener('click', () => navigateChapter(-1));
-        nextChapterBtn.addEventListener('click', () => navigateChapter(1));
-        
-        // Disable "Prev" if it's chapter 1
-        prevChapterBtn.disabled = (AppState.currentBibleReference.chapter <= 1);
-        // We don't know the max chapters, so "Next" is always enabled for now.
-        nextChapterBtn.disabled = false;
         
     } else {
         // We are in "Module" mode (or general)
@@ -691,8 +817,33 @@ function displayAnalysis(content, analysisType, context) {
     // --- 3. FORMAT AND APPEND CONTENT ---
     const contentEl = document.createElement('div');
     contentEl.className = 'analysis-content';
-    contentEl.innerHTML = formatAiResponse(content);
+    
+    if (analysisType === 'scripture') {
+        // For first load of scripture, add a chapter title
+        contentEl.innerHTML = `<h2>${context.chapter}</h2>` + formatAiResponse(content);
+    } else {
+        // For module analysis, just add content
+        contentEl.innerHTML = formatAiResponse(content);
+    }
+    
     DOMElements.analysisDisplay.appendChild(contentEl);
+    
+    // Scroll to the verse if it was specified
+    if (analysisType === 'scripture' && AppState.currentBibleReference.verse > 1) {
+        setTimeout(() => {
+            const verseEl = contentEl.querySelector(`strong.verse-number:contains('[${AppState.currentBibleReference.verse}]')`);
+            if (verseEl) {
+                verseEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                // Fallback: just scroll to top of content
+                contentEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 100);
+    } else if (analysisType === 'scripture') {
+         // Scroll to top of pane
+         DOMElements.resultsMain.scrollTop = 0;
+    }
+
 
     // --- 4. APPEND FOOTER ---
     const footerEl = document.createElement('div');
@@ -765,7 +916,10 @@ function switchModule(module, forceSwitch = false) {
     // Auto-run analysis
     const passage = DOMElements.passageInput.value.trim();
     if (passage) {
-        generateModuleAnalysis();
+        // Don't auto-run if we're in reader mode
+        if (!AppState.currentReaderMode) {
+            generateModuleAnalysis();
+        }
     }
 }
 
