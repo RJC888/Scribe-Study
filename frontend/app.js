@@ -20,8 +20,6 @@ const AppState = {
 // ===== MODULE DEFINITIONS =====
 // NOTE: Add your Grammar Essentials and Advanced Grammar prompts here
 const ModuleDefinitions = {
-    // ===== MODULE DEFINITIONS =====
-const ModuleDefinitions = {
     'original-languages': {
         name: 'Original Languages',
         modules: {
