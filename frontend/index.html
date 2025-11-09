@@ -219,14 +219,16 @@
             padding: 20px 32px;
             border-bottom: 1px solid var(--sand);
             display: flex;
-            gap: 20px;
-            align-items: center;
+            flex-direction: column; /* CHANGED */
+            align-items: center; /* CHANGED */
+            gap: 16px; /* CHANGED */
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         .search-main {
-            flex: 1;
-            max-width: 500px;
+            flex-shrink: 0; /* ADDED */
+            width: 100%; /* ADDED */
+            max-width: 900px; /* CHANGED */
         }
 
         .search-label {
@@ -255,57 +257,69 @@
             border-color: var(--evergreen);
             box-shadow: 0 0 0 3px rgba(74, 93, 78, 0.1);
         }
+        
+        /* NEW: Action Bar */
+        .action-bar {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            width: 100%;
+            max-width: 900px;
+        }
 
-        .module-display {
-            padding: 12px 20px;
-            /* background: var(--evergreen); */ /* REMOVED */
-            /* color: white; */ /* REMOVED */
-            color: var(--text-dark); /* ADDED */
-            background: white; /* ADDED */
-            border: 2px solid var(--sand); /* ADDED */
+        .action-btn {
+            flex-grow: 1;
+            padding: 12px 24px;
+            border: none;
             border-radius: 6px;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
         }
 
-        .ai-selector {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        /* Primary action button */
+        .action-btn.primary {
+            background: var(--evergreen);
+            color: white;
+        }
+        .action-btn.primary:hover:not(:disabled) {
+            background: var(--pine);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(74, 93, 78, 0.3);
         }
 
-        .ai-label {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-medium);
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-        }
-
-        .ai-select {
-            padding: 10px 14px;
-            border: 2px solid var(--evergreen);
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-dark);
+        /* Secondary action buttons */
+        .action-btn.secondary {
             background: white;
-            cursor: pointer;
-            transition: all 0.2s;
+            color: var(--evergreen);
+            border: 2px solid var(--sand);
         }
-
-        .ai-select:hover {
-            border-color: var(--pine);
-        }
-
-        .ai-select:focus {
-            outline: none;
+        .action-btn.secondary:hover:not(:disabled) {
             border-color: var(--evergreen);
-            box-shadow: 0 0 0 3px rgba(74, 93, 78, 0.1);
+            background: var(--warm-white);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
+        
+        .action-btn:disabled {
+            background: var(--stone);
+            color: var(--stone-light);
+            border-color: var(--stone);
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+
+        /* REMOVED .module-display styles */
+
+        /* ... */
 
         .results-main {
             flex: 1;
@@ -349,32 +363,7 @@
             margin: 0 auto;
         }
 
-        .generate-btn {
-            /* margin-top: 20px; */ /* REMOVED so it aligns in the header */
-            padding: 14px 32px;
-            background: var(--evergreen);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .generate-btn:hover:not(:disabled) {
-            background: var(--pine);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(74, 93, 78, 0.3);
-        }
-
-        .generate-btn:disabled {
-            background: var(--stone);
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
+        /* REMOVED .generate-btn styles (now part of .action-btn) */
 
         .version-controls {
             display: flex;
@@ -842,32 +831,8 @@
             text-align: center;
         }
         
-        /* Regenerate Button Styling - Used by .generate-btn */
-        .regenerate-btn {
-            background: var(--evergreen);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
+        /* REMOVED .regenerate-btn styles */
 
-        .regenerate-btn:hover:not(:disabled) {
-            background: var(--pine);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        .regenerate-btn:active {
-            transform: translateY(0);
-        }
 </style>
 </head>
 <body>
@@ -961,40 +926,51 @@
         <!-- Content Area -->
         <main class="content-area">
             <div class="content-header">
+                <!-- REDESIGNED SEARCH AREA -->
                 <div class="search-main">
-                    <label class="search-label">Scripture Passage</label>
+                    <label class="search-label">Scripture Passage or General Question</label>
                     <input 
                         type="text" 
                         class="search-input" 
                         id="passageInput"
-                        placeholder="e.g., John 3:16, Romans 8:28, Ephesians 2:8-10"
+                        placeholder="e.g., John 3:16, Romans 8, or 'What is the doctrine of imputation?'"
                     >
                 </div>
                 
-                <!-- NEW GLOBAL GENERATE BUTTON -->
-                <button class="generate-btn" id="globalGenerateBtn" style="margin-right: 12px; margin-top: 22px;">Generate</button>
-
-                <div class="module-display" id="moduleDisplay" style="margin-top: 22px;">
-                    <span>📖</span>
-                    <span id="currentModuleName">Spiritual Analysis</span>
+                <!-- NEW ACTION BAR -->
+                <div class="action-bar">
+                    <button class="action-btn primary" id="moduleAnalysisBtn">
+                        <span>📖</span>
+                        <span>Run Module Analysis</span>
+                    </button>
+                    <button class="action-btn secondary" id="displayScriptureBtn">
+                        <span>📚</span>
+                        <span>Display Scripture Text</span>
+                    </button>
+                    <button class="action-btn secondary" id="askAiBtn">
+                        <span>✨</span>
+                        <span>Ask General Question</span>
+                    </button>
                 </div>
+                <!-- END OF REDESIGN -->
 
-                <div class="groq-badge" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--warm-white); border-radius: 8px; font-size: 13px; color: var(--text-medium); margin-top: 22px;">
-                    <span style="font-size: 18px;">⚡</span>
-                    <span>Powered by Groq (Lightning-fast AI)</span>
-                </div>
+                <!-- REMOVED old module-display and groq-badge -->
             </div>
 
             <div class="results-main">
                 <div class="analysis-display" id="analysisDisplay">
                     <div class="status-message">
                         <div class="status-icon">✨</div>
-                        <div class_s="status-title">Ready to Study God's Word</div>
+                        <div class="status-title">Ready to Study God's Word</div>
                         <p class="status-text">
-                            Enter your scripture passage above, then simply click a module tab. 
-                            Analysis generates automatically—streamlined for deep theological study.
+                            Enter a scripture passage or question above.
+                            <br>
+                            - Use <strong>Run Module Analysis</strong> to use the selected module from the left.
+                            <br>
+                            - Use <strong>Display Scripture Text</strong> to read the passage.
+                            <br>
+                            - Use <strong>Ask General Question</strong> for any other query.
                         </p>
-                        <!-- <button class="generate-btn" id="generateBtn">Generate Analysis</button> --> <!-- REMOVED -->
                         
                         <div class="version-controls" id="versionControls" style="display: none;">
                             <button class="version-btn" id="prevVersionBtn" disabled>◀ Previous</button>
@@ -1007,7 +983,7 @@
         </main>
 
         <!-- Notes Panel -->
-        <aside class="notes-panel" id="notesPanel">
+        <aside classs="notes-panel" id="notesPanel">
             <button class="notes-tab" id="notesToggle">
                 <span id="notesArrow">▶</span>
                 NOTES
@@ -1044,7 +1020,7 @@
                     </div>
 
                     <div class="notes-toolbar">
-                        <button class="notes-tool-btn" id="exportBtn">📥 Export</button>
+                        <button classs="notes-tool-btn" id="exportBtn">📥 Export</button>
                         <button class="notes-tool-btn" id="copyBtn">📋 Copy</button>
                         <button class="notes-tool-btn" id="deleteBtn">🗑 Delete</button>
                     </div>
