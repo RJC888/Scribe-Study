@@ -138,7 +138,7 @@ Make technical analysis accessible while maintaining precision.`,
     },
     'devotional': {
 
-**If passage is New Testament:**
+//If passage is New Testament:**
 - Display Greek text with transliteration
 - Analyze Greek grammatical features
 - Explain Greek cases, verb aspects, participles
@@ -153,7 +153,7 @@ Focus on making complex grammar accessible while maintaining scholarly accuracy.
                 prompt: `Perform comprehensive syntactic analysis of {passage} combining scholarly precision with theological depth.
 
 LANGUAGE AUTO-DETECTION & SCHOLARLY TREATMENT:
-**If Old Testament:**
+//If Old Testament:**
 - Display Hebrew text (pointed Masoretic)
 - Provide transliteration for accessibility
 - Analyze ALL Hebrew grammatical features:
