@@ -111,39 +111,34 @@
     transform: translateY(-50%);
     width: 32px;
     height: 120px;
-    background: var(--evergreen);  /* RESTORED - needed for visibility */
+    background: var(--evergreen);
     border: none;
-    border-radius: 0 8px 8px 0;  /* RESTORED - needed for the tab shape */
+    border-radius: 0 8px 8px 0;
     cursor: pointer;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 8px;
+    color: white;
     font-size: 11px;
-    font-weight: 600;
-    color: white;  /* Changed from var(--sand) */
+    font-weight: 700;
+    z-index: 10;
+    transition: all 0.2s;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.15);
     writing-mode: vertical-rl;
     letter-spacing: 1px;
-    padding: 12px 8px;
-    transition: all 0.3s ease;
-    z-index: 10;  /* RESTORED - needed to show above content */
-    box-shadow: 2px 0 8px rgba(0,0,0,0.15);  /* RESTORED - needed for depth */
 }
 
 .sidebar-tab:hover {
     background: var(--pine);
-    color: white;
+    right: -34px;
 }
 
 .sidebar-tab.active {
     background: var(--stone-dark);
-    opacity: 1;
-    font-weight: 600;
 }
-        .sidebar-tab:hover {
-            background: var(--pine);
-            right: -34px;
-        }
-
+        
         .sidebar-content {
             padding: 28px 20px;
             height: 100%;
