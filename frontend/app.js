@@ -18,7 +18,6 @@ const AppState = {
 };
 
 // ===== MODULE DEFINITIONS =====
-// NOTE: Add your Grammar Essentials and Advanced Grammar prompts here
 const ModuleDefinitions = {
     'languages': { // <--- FIXED: Was 'original-languages', now matches HTML
         name: 'Original Languages',
@@ -92,7 +91,7 @@ Include detailed morphological analysis, clause structures, and syntactic relati
                 - Theological implications of specific forms`,
                 icon: '📝'
             },
-            'lexicon': {
+            'greek-hebrew': { // Changed from 'lexicon' to match HTML
                 name: 'Greek/Hebrew Lexicon',
                 prompt: `Provide lexical analysis for key terms in {passage}:
 
@@ -120,7 +119,7 @@ Focus on words that carry theological weight or cultural significance.`,
 Show how word meanings shift based on context while maintaining core concepts.`,
                 icon: '🎯'
             },
-            'verse-by-verse-grammar': {
+            'verse-by-verse': { // Changed from 'verse-by-verse-grammar' to match HTML
                 name: 'Verse-by-Verse Grammar',
                 prompt: `Provide verse-by-verse grammatical analysis of {passage}:
 
@@ -136,10 +135,6 @@ Make technical analysis accessible while maintaining precision.`,
             }
         }
     },
-    // ===== CRITICAL ERROR FIXED =====
-    // The entire duplicated, broken block of code from 
-    // lines 126-183 has been removed.
-    // ================================
     'devotional': {
         name: 'Devotional',
         modules: {
@@ -218,10 +213,6 @@ Avoid generic observations—focus on transformative truth that leads to worship
             }
         }
     },
-    // ===== CRITICAL ERROR FIXED =====
-    // The placeholder 'languages' block has been removed, 
-    // as it was replaced by the corrected block at the top.
-    // ================================
     'context': {
         name: 'Context & Background',
         modules: {
@@ -334,7 +325,7 @@ function initializeApp() {
     });
 
     // Generate button
-    document.getElementById('generateBtn').addEventListener('click', generateAnalysis);
+    document.getElementById('globalGenerateBtn').addEventListener('click', generateAnalysis); // FIXED
     
     // Enter key
     document.getElementById('passageInput').addEventListener('keypress', (e) => {
@@ -365,8 +356,7 @@ async function generateAnalysis() {
     const passage = document.getElementById('passageInput').value.trim();
     
     if (!passage) {
-        // FIXED: Replaced alert() with showError()
-        showError('Please enter a scripture passage');
+        showError('Please enter a scripture passage'); // FIXED
         return;
     }
 
@@ -422,6 +412,14 @@ async function generateAnalysis() {
 
 // ===== DISPLAY FUNCTIONS =====
 function showLoadingState(moduleName, passage) {
+    // ADDED BLOCK: Update global button state
+    const genBtn = document.getElementById('globalGenerateBtn');
+    if (genBtn) {
+        genBtn.disabled = true;
+        genBtn.textContent = 'Generating...';
+    }
+    // END ADDED BLOCK
+
     const display = document.getElementById('analysisDisplay');
     display.innerHTML = `
         <div style="padding: 40px; text-align: center;">
@@ -442,39 +440,83 @@ function showLoadingState(moduleName, passage) {
 }
 
 function displayAnalysis(analysis, moduleName, passage) {
+    // ADDED BLOCK: Update global button state
+    const genBtn = document.getElementById('globalGenerateBtn');
+    if (genBtn) {
+        genBtn.disabled = false;
+        genBtn.textContent = '↻ Regenerate';
+    }
+    // END ADDED BLOCK
+
     const display = document.getElementById('analysisDisplay');
     
-    // Convert markdown to HTML
-    // NOTE: This is a basic converter and may have bugs with complex markdown.
+    // --- New, More Robust Markdown-to-HTML Converter ---
     let formatted = analysis
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+        .replace(/\*(.*?)\*/g, '<em>$1</em>'); // Italic
+
+    // Headers
+    formatted = formatted
         .replace(/^### (.+)$/gm, '<h3>$1</h3>')
         .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-        .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-        .replace(/\n\n/g, '</p><p>')
-        .replace(/^- (.+)$/gm, '<li>$1</li>')
-        .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>'); // Note: This line is buggy and will wrap ALL <li>s in one <ul>
+        .replace(/^# (.+)$/gm, '<h1>$1</h1>');
 
-    if (!formatted.startsWith('<')) {
-        formatted = '<p>' + formatted + '</p>';
+    // Unordered lists (hyphens or asterisks)
+    formatted = formatted.replace(/^(?:(?:-|\*)\s.*(?:\n|$))+/gm, (match) => {
+        const items = match.trim().split('\n');
+        return '<ul>\n' + items.map(item => `  <li>${item.substring(item.indexOf(' ')).trim()}</li>`).join('\n') + '\n</ul>';
+    });
+
+    // Ordered lists
+    formatted = formatted.replace(/^(?:\d+\.\s.*(?:\n|$))+/gm, (match) => {
+        const items = match.trim().split('\n');
+        return '<ol>\n' + items.map(item => `  <li>${item.substring(item.indexOf(' ')).trim()}</li>`).join('\n') + '\n</ol>';
+    });
+    
+    // Paragraphs
+    const lines = formatted.split('\n');
+    let html = '';
+    let inParagraph = false;
+
+    for (const line of lines) {
+        if (line.trim() === '') {
+            if (inParagraph) {
+                html += '</p>\n';
+                inParagraph = false;
+            }
+            html += '\n'; // Add a newline for separation
+        } else if (line.startsWith('<ul>') || line.startsWith('<ol>') || line.startsWith('<li>') || line.startsWith('</ul>') || line.startsWith('</ol>') || line.startsWith('<h')) {
+            if (inParagraph) {
+                html += '</p>\n';
+                inParagraph = false;
+            }
+            html += line + '\n';
+        } else {
+            if (!inParagraph) {
+                html += '<p>';
+                inParagraph = true;
+            }
+            html += line + ' '; // Join lines in a paragraph
+        }
     }
+    if (inParagraph) {
+        html += '</p>\n';
+    }
+    // --- End of New Converter ---
 
     display.innerHTML = `
         <div class="analysis-header">
             <div class="analysis-title">
-                <span classs="analysis-icon">📖</span>
+                <span class="analysis-icon">📖</span>
                 <div>
                     <div class="analysis-passage">${passage}</div>
                     <div class="analysis-module">${moduleName}</div>
                 </div>
             </div>
-            <div class="analysis-actions">
-                <button class="generate-btn" id="regenerateAnalysisBtn">↻ Regenerate</button>
-            </div>
+            <!-- REMOVED DYNAMIC REGENERATE BUTTON -->
         </div>
         <div class="analysis-content">
-            ${formatted}
+            ${html} <!-- USE NEW 'html' VARIABLE -->
         </div>
         <div class="analysis-footer">
             <span style="color: var(--text-medium); font-size: 12px;">
@@ -483,13 +525,20 @@ function displayAnalysis(analysis, moduleName, passage) {
         </div>
     `;
 
-    // Add event listener properly instead of inline HTML onclick
-    document.getElementById('regenerateAnalysisBtn').addEventListener('click', generateAnalysis);
+    // document.getElementById('regenerateAnalysisBtn').addEventListener('click', generateAnalysis); // REMOVED
 
     updateVersionControls();
 }
 
 function showError(message) {
+    // ADDED BLOCK: Update global button state
+    const genBtn = document.getElementById('globalGenerateBtn');
+    if (genBtn) {
+        genBtn.disabled = false;
+        genBtn.textContent = 'Try Again';
+    }
+    // END ADDED BLOCK
+
     const display = document.getElementById('analysisDisplay');
     display.innerHTML = `
         <div style="padding: 40px; text-align: center;">
@@ -500,14 +549,11 @@ function showError(message) {
             <div style="font-size: 14px; color: var(--text-medium); margin-bottom: 20px;">
                 ${message}
             </div>
-            <button class="generate-btn" id="tryAgainBtn">
-                Try Again
-            </button>
+            <!-- REMOVED DYNAMIC TRY AGAIN BUTTON -->
         </div>
     `;
     
-    // Add event listener
-    document.getElementById('tryAgainBtn').addEventListener('click', generateAnalysis);
+    // document.getElementById('tryAgainBtn').addEventListener('click', generateAnalysis); // REMOVED
 }
 
 // ===== NAVIGATION =====
@@ -555,6 +601,11 @@ function getModuleInfo(category, module) {
 function updateModuleDisplay() {
     const moduleInfo = getModuleInfo(AppState.currentCategory, AppState.currentModule);
     document.getElementById('currentModuleName').textContent = moduleInfo.name;
+    // Also update the icon
+    const iconEl = document.querySelector('#moduleDisplay span:first-child');
+    if (iconEl) {
+        iconEl.textContent = moduleInfo.icon || '📖';
+    }
 }
 
 function toggleSidebar() {
