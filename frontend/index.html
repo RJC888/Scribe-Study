@@ -104,32 +104,41 @@
             border-right: none;
         }
 
-        .sidebar-tab {
-            position: absolute;
-            right: -32px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 32px;
-            height: 120px;
-            background: var(--evergreen);
-            border: none;
-            border-radius: 0 8px 8px 0;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            color: var(--sand);
-            font-size: 11px;
-            font-weight: 700;
-            z-index: 10;
-            transition: all 0.2s;
-            box-shadow: 2px 0 8px rgba(0,0,0,0.15);
-            writing-mode: vertical-rl;
-            letter-spacing: 1px;
-        }
+       .sidebar-tab {
+    position: absolute;
+    right: -32px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 120px;
+    background: transparent;
+    border: none;
+    border-left: 3px solid transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--sand);
+    writing-mode: vertical-rl;
+    letter-spacing: 1px;
+    padding: 12px 8px;
+    transition: all 0.3s ease;
+}
 
+.sidebar-tab:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-left-color: var(--pine);
+    color: white;
+}
+
+.sidebar-tab.active {
+    background: var(--stone-dark);
+    opacity: 1;
+    font-weight: 600;
+    border-left-color: var(--pine);
+}
         .sidebar-tab:hover {
             background: var(--pine);
             right: -34px;
