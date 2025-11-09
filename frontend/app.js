@@ -589,10 +589,21 @@ function setLoadingState(isLoading, message = "Loading...") {
         DOMElements.moduleAnalysisBtn.disabled = true;
         DOMElements.moduleAnalysisBtn.innerHTML = `<span><div class="loading-dots" style="font-size: 14px; color: white;"><span>.</span><span>.</span><span>.</span></div></span> ${message}`;
         DOMElements.displayScriptureBtn.disabled = true;
+
+        // NEW: Find and disable reader buttons if they exist
+        const prevBtn = DOMElements.analysisDisplay.querySelector('#prevChapterBtn');
+        const nextBtn = DOMElements.analysisDisplay.querySelector('#nextChapterBtn');
+        if (prevBtn) prevBtn.disabled = true;
+        if (nextBtn) nextBtn.disabled = true;
+
     } else {
         DOMElements.moduleAnalysisBtn.disabled = false;
         DOMElements.moduleAnalysisBtn.innerHTML = `<span>📖</span> Run Module Analysis`;
         DOMElements.displayScriptureBtn.disabled = false;
+        
+        // NOTE: We do NOT re-enable the reader buttons here.
+        // The displayAnalysis function is responsible for setting the
+        // state of the *new* buttons it creates.
     }
 }
 
