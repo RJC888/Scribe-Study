@@ -258,8 +258,11 @@
 
         .module-display {
             padding: 12px 20px;
-            background: var(--evergreen);
-            color: white;
+            /* background: var(--evergreen); */ /* REMOVED */
+            /* color: white; */ /* REMOVED */
+            color: var(--text-dark); /* ADDED */
+            background: white; /* ADDED */
+            border: 2px solid var(--sand); /* ADDED */
             border-radius: 6px;
             font-size: 13px;
             font-weight: 600;
@@ -347,7 +350,7 @@
         }
 
         .generate-btn {
-            margin-top: 20px;
+            /* margin-top: 20px; */ /* REMOVED so it aligns in the header */
             padding: 14px 32px;
             background: var(--evergreen);
             color: white;
@@ -359,10 +362,18 @@
             transition: all 0.2s;
         }
 
-        .generate-btn:hover {
+        .generate-btn:hover:not(:disabled) {
             background: var(--pine);
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(74, 93, 78, 0.3);
+        }
+
+        .generate-btn:disabled {
+            background: var(--stone);
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
         .version-controls {
@@ -801,6 +812,28 @@
             background: var(--warm-white);
             border-bottom: 1px solid var(--sand);
         }
+        
+        .analysis-title {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .analysis-icon {
+            font-size: 24px;
+        }
+        
+        .analysis-passage {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        
+        .analysis-module {
+            font-size: 13px;
+            color: var(--text-medium);
+            font-weight: 600;
+        }
 
         .analysis-footer {
             padding: 16px 28px;
@@ -808,34 +841,33 @@
             border-top: 1px solid var(--sand);
             text-align: center;
         }
-        ... (existing CSS above) ...
+        
+        /* Regenerate Button Styling - Used by .generate-btn */
+        .regenerate-btn {
+            background: var(--evergreen);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
 
-    /* Regenerate Button Styling */
-    .regenerate-btn {
-        background: var(--evergreen);
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 600;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
+        .regenerate-btn:hover:not(:disabled) {
+            background: var(--pine);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
 
-    .regenerate-btn:hover {
-        background: var(--pine);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-
-    .regenerate-btn:active {
-        transform: translateY(0);
-    }
+        .regenerate-btn:active {
+            transform: translateY(0);
+        }
 </style>
 </head>
 <body>
@@ -907,7 +939,7 @@
                 <div class="module-group" data-category="jewish">
                     <button class="secondary-tab" data-module="second-temple">Second Temple Period</button>
                     <button class="secondary-tab" data-module="rabbinic">Rabbinic Literature</button>
-                    <button class="secondary-tab" data-module="dead-sea-scrolls">Dead Sea Scrolls</button>
+                    <button classs="secondary-tab" data-module="dead-sea-scrolls">Dead Sea Scrolls</button>
                     <button class="secondary-tab" data-module="pseudepigrapha">Pseudepigrapha</button>
                 </div>
 
@@ -939,12 +971,15 @@
                     >
                 </div>
                 
-                <div class="module-display" id="moduleDisplay">
+                <!-- NEW GLOBAL GENERATE BUTTON -->
+                <button class="generate-btn" id="globalGenerateBtn" style="margin-right: 12px; margin-top: 22px;">Generate</button>
+
+                <div class="module-display" id="moduleDisplay" style="margin-top: 22px;">
                     <span>📖</span>
                     <span id="currentModuleName">Spiritual Analysis</span>
                 </div>
 
-                <div class="groq-badge" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--warm-white); border-radius: 8px; font-size: 13px; color: var(--text-medium);">
+                <div class="groq-badge" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--warm-white); border-radius: 8px; font-size: 13px; color: var(--text-medium); margin-top: 22px;">
                     <span style="font-size: 18px;">⚡</span>
                     <span>Powered by Groq (Lightning-fast AI)</span>
                 </div>
@@ -954,12 +989,12 @@
                 <div class="analysis-display" id="analysisDisplay">
                     <div class="status-message">
                         <div class="status-icon">✨</div>
-                        <div class="status-title">Ready to Study God's Word</div>
+                        <div class_s="status-title">Ready to Study God's Word</div>
                         <p class="status-text">
                             Enter your scripture passage above, then simply click a module tab. 
                             Analysis generates automatically—streamlined for deep theological study.
                         </p>
-                        <button class="generate-btn" id="generateBtn">Generate Analysis</button>
+                        <!-- <button class="generate-btn" id="generateBtn">Generate Analysis</button> --> <!-- REMOVED -->
                         
                         <div class="version-controls" id="versionControls" style="display: none;">
                             <button class="version-btn" id="prevVersionBtn" disabled>◀ Previous</button>
