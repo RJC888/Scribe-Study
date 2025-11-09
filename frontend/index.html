@@ -104,40 +104,40 @@
             border-right: none;
         }
 
-.sidebar-tab {
-    position: absolute;
-    right: -32px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 32px;
-    height: 120px;
-    background: var(--evergreen);
-    border: none;
-    border-radius: 0 8px 8px 0;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    color: white;
-    font-size: 11px;
-    font-weight: 700;
-    z-index: 10;
-    transition: all 0.2s;
-    box-shadow: 2px 0 8px rgba(0,0,0,0.15);
-    writing-mode: vertical-rl;
-    letter-spacing: 1px;
-}
+        .sidebar-tab {
+            position: absolute;
+            right: -32px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 120px;
+            background: var(--evergreen);
+            border: none;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            z-index: 10;
+            transition: all 0.2s;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+            writing-mode: vertical-rl;
+            letter-spacing: 1px;
+        }
 
-.sidebar-tab:hover {
-    background: var(--pine);
-    right: -34px;
-}
+        .sidebar-tab:hover {
+            background: var(--pine);
+            right: -34px;
+        }
 
-.sidebar-tab.active {
-    background: var(--stone-dark);
-}
+        .sidebar-tab.active {
+            background: var(--stone-dark);
+        }
         
         .sidebar-content {
             padding: 28px 20px;
@@ -218,17 +218,13 @@
             background: var(--warm-white);
             padding: 20px 32px;
             border-bottom: 1px solid var(--sand);
-            display: flex;
-            flex-direction: column; /* CHANGED */
-            align-items: center; /* CHANGED */
-            gap: 16px; /* CHANGED */
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         .search-main {
-            flex-shrink: 0; /* ADDED */
-            width: 100%; /* ADDED */
-            max-width: 900px; /* CHANGED */
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
         }
 
         .search-label {
@@ -239,17 +235,19 @@
             letter-spacing: 0.8px;
             margin-bottom: 8px;
             display: block;
+            text-align: center;
         }
 
         .search-input {
             width: 100%;
-            padding: 12px 16px;
+            padding: 14px 20px;
             border: 2px solid var(--sand);
             border-radius: 6px;
-            font-size: 14px;
+            font-size: 15px;
             color: var(--text-dark);
             background: white;
             transition: all 0.2s;
+            text-align: center;
         }
 
         .search-input:focus {
@@ -257,19 +255,20 @@
             border-color: var(--evergreen);
             box-shadow: 0 0 0 3px rgba(74, 93, 78, 0.1);
         }
-        
-        /* NEW: Action Bar */
+
         .action-bar {
             display: flex;
             gap: 12px;
-            justify-content: center;
-            width: 100%;
             max-width: 900px;
+            margin: 16px auto 0;
+            align-items: stretch;
         }
 
         .action-btn {
-            flex-grow: 1;
+            flex: 1;
             padding: 12px 24px;
+            background: var(--evergreen);
+            color: white;
             border: none;
             border-radius: 6px;
             font-size: 14px;
@@ -279,47 +278,61 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
         }
 
-        /* Primary action button */
-        .action-btn.primary {
-            background: var(--evergreen);
-            color: white;
-        }
-        .action-btn.primary:hover:not(:disabled) {
+        .action-btn:hover:not(:disabled) {
             background: var(--pine);
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(74, 93, 78, 0.3);
         }
 
-        /* Secondary action buttons */
-        .action-btn.secondary {
-            background: white;
-            color: var(--evergreen);
-            border: 2px solid var(--sand);
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: var(--evergreen);
         }
-        .action-btn.secondary:hover:not(:disabled) {
-            border-color: var(--evergreen);
-            background: var(--warm-white);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+
+        .action-btn span:first-child {
+            font-size: 18px;
+        }
+
+        .version-select-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .version-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-medium);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
         }
         
-        .action-btn:disabled {
-            background: var(--stone);
-            color: var(--stone-light);
-            border-color: var(--stone);
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
+        .version-select {
+            padding: 6px 10px;
+            border: 2px solid var(--evergreen);
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            height: 100%; /* Match button height */
         }
 
+        .version-select:hover {
+            border-color: var(--pine);
+        }
 
-        /* REMOVED .module-display styles */
-
-        /* ... */
+        .version-select:focus {
+            outline: none;
+            border-color: var(--evergreen);
+            box-shadow: 0 0 0 3px rgba(74, 93, 78, 0.1);
+        }
 
         .results-main {
             flex: 1;
@@ -331,7 +344,6 @@
             max-width: 900px;
             margin: 0 auto;
             background: white;
-            padding: 48px;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             border: 1px solid var(--sand);
@@ -363,13 +375,11 @@
             margin: 0 auto;
         }
 
-        /* REMOVED .generate-btn styles (now part of .action-btn) */
-
         .version-controls {
-            display: flex;
+            display: none; /* Hidden by default */
+            margin-top: 20px;
             gap: 8px;
             justify-content: center;
-            margin-top: 20px;
             align-items: center;
         }
 
@@ -793,6 +803,7 @@
             font-weight: 600;
         }
 
+        /* --- HEADER STYLES --- */
         .analysis-header {
             display: flex;
             justify-content: space-between;
@@ -801,27 +812,27 @@
             background: var(--warm-white);
             border-bottom: 1px solid var(--sand);
         }
-        
+
         .analysis-title {
             display: flex;
             align-items: center;
             gap: 16px;
         }
-        
+
         .analysis-icon {
             font-size: 24px;
         }
-        
+
         .analysis-passage {
-            font-size: 16px;
-            font-weight: 700;
+            font-size: 18px;
+            font-weight: 600;
             color: var(--text-dark);
         }
-        
+
         .analysis-module {
             font-size: 13px;
             color: var(--text-medium);
-            font-weight: 600;
+            font-weight: 500;
         }
 
         .analysis-footer {
@@ -831,9 +842,56 @@
             text-align: center;
         }
         
-        /* REMOVED .regenerate-btn styles */
+        /* --- NEW: Reader Controls --- */
+        .reader-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
 
-</style>
+        .reader-nav-btn {
+            background: var(--evergreen);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 10px 20px;
+        }
+        .reader-nav-btn:hover:not(:disabled) {
+            background: var(--pine);
+        }
+        .reader-nav-btn:disabled {
+            background: var(--sand);
+            cursor: not-allowed;
+        }
+
+        .reader-title-display {
+            text-align: center;
+        }
+        
+        .reader-chapter-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .reader-version-title {
+            font-size: 13px;
+            color: var(--text-medium);
+            font-weight: 500;
+        }
+
+        /* Utility class to hide elements */
+        .hidden {
+            display: none !important;
+        }
+
+
+    </style>
 </head>
 <body>
     <!-- Header -->
@@ -889,6 +947,7 @@
                     <button class="secondary-tab" data-module="advanced-grammar">Advanced Grammar</button>
                     <button class="secondary-tab" data-module="verse-by-verse">Verse-by-Verse Grammar</button>
                     <button class="secondary-tab" data-module="semantic-range">Semantic Range</button>
+                    <!-- New Interlinear Module from Step 4 will go here -->
                 </div>
 
                 <!-- Context Modules -->
@@ -924,60 +983,54 @@
         </aside>
 
         <!-- Content Area -->
-        <main class="content-area">
+        <main classs="content-area">
             <div class="content-header">
-                <!-- REDESIGNED SEARCH AREA -->
                 <div class="search-main">
                     <label class="search-label">Scripture Passage or General Question</label>
                     <input 
                         type="text" 
                         class="search-input" 
                         id="passageInput"
-                        placeholder="e.g., John 3:16, Romans 8, or 'What is the doctrine of imputation?'"
+                        placeholder="e.g., John 3:16, Romans 8, or 'What is propitiation?'"
                     >
+                    <div class="action-bar">
+                        <button class="action-btn" id="moduleAnalysisBtn">
+                            <span>📖</span>
+                            <span>Run Module Analysis</span>
+                        </button>
+                        <select class="version-select" id="versionSelect">
+                            <option value="Modern English (Default)">Modern English (Default)</option>
+                            <option value="KJV">King James Version (KJV)</option>
+                            <option value="WEB">World English Bible (WEB)</option>
+                            <option value="Reina-Valera 1909">Spanish (Reina-Valera 1909)</option>
+                            <!-- Step 3 will add more versions here -->
+                        </select>
+                        <button class="action-btn" id="displayScriptureBtn">
+                            <span>📚</span>
+                            <span>Display Scripture Text</span>
+                        </button>
+                    </div>
                 </div>
-                
-                <!-- NEW ACTION BAR -->
-                <div class="action-bar">
-                    <button class="action-btn primary" id="moduleAnalysisBtn">
-                        <span>📖</span>
-                        <span>Run Module Analysis</span>
-                    </button>
-                    <button class="action-btn secondary" id="displayScriptureBtn">
-                        <span>📚</span>
-                        <span>Display Scripture Text</span>
-                    </button>
-                    <button class="action-btn secondary" id="askAiBtn">
-                        <span>✨</span>
-                        <span>Ask General Question</span>
-                    </button>
-                </div>
-                <!-- END OF REDESIGN -->
-
-                <!-- REMOVED old module-display and groq-badge -->
             </div>
 
             <div class="results-main">
                 <div class="analysis-display" id="analysisDisplay">
-                    <div class="status-message">
+                    <!-- Initial Status Message -->
+                    <div class="status-message" id="statusMessage">
                         <div class="status-icon">✨</div>
                         <div class="status-title">Ready to Study God's Word</div>
                         <p class="status-text">
-                            Enter a scripture passage or question above.
-                            <br>
-                            - Use <strong>Run Module Analysis</strong> to use the selected module from the left.
-                            <br>
-                            - Use <strong>Display Scripture Text</strong> to read the passage.
-                            <br>
-                            - Use <strong>Ask General Question</strong> for any other query.
+                            Enter your scripture passage above, then simply click a module tab. 
+                            Or, select a version and display the full scripture text.
                         </p>
                         
-                        <div class="version-controls" id="versionControls" style="display: none;">
+                        <div class="version-controls" id="versionControls">
                             <button class="version-btn" id="prevVersionBtn" disabled>◀ Previous</button>
                             <span class="version-indicator" id="versionIndicator">Version 1 of 1</span>
                             <button class="version-btn" id="nextVersionBtn" disabled>Next ▶</button>
                         </div>
                     </div>
+                    <!-- Analysis content will be injected here -->
                 </div>
             </div>
         </main>
@@ -995,7 +1048,7 @@
                         <div class="size-controls">
                             <button class="size-btn" id="collapseBtn" data-tooltip="Collapse">◀</button>
                             <button class="size-btn active" id="normalBtn" data-tooltip="Normal (400px)">↔</button>
-                            <button class="size-btn" id="mediumBtn" data-tooltip="Medium (600px)">↔</button>
+                            <button class="size-btn" id="mediumBtn" data-tooltip="Medium (600px)">↔</Mbutton>
                             <button class="size-btn" id="wideBtn" data-tooltip="Wide (800px)">⛶</button>
                         </div>
                     </div>
@@ -1020,7 +1073,7 @@
                     </div>
 
                     <div class="notes-toolbar">
-                        <button classs="notes-tool-btn" id="exportBtn">📥 Export</button>
+                        <button class="notes-tool-btn" id="exportBtn">📥 Export</button>
                         <button class="notes-tool-btn" id="copyBtn">📋 Copy</button>
                         <button class="notes-tool-btn" id="deleteBtn">🗑 Delete</button>
                     </div>
@@ -1047,6 +1100,33 @@
             </div>
         </aside>
     </div>
+
+    <!-- 
+      ANALYSIS HEADER TEMPLATE 
+      This is the template for the header of the analysis content.
+    -->
+    <template id="analysisHeaderTemplate">
+        <div class="analysis-header">
+            <!-- 1. Analysis Title (Default View) -->
+            <div class="analysis-title" id="analysisTitleDisplay">
+                <span class="analysis-icon">📖</span>
+                <div>
+                    <div class="analysis-passage" id="analysisPassageDisplay">Romans 8:1-8</div>
+                    <div class="analysis-module" id="analysisModuleDisplay">Advanced Grammar</div>
+                </div>
+            </div>
+
+            <!-- 2. Reader Controls (Scripture Display View) -->
+            <div class="reader-controls hidden" id="readerControlsDisplay">
+                <button class="reader-nav-btn" id="prevChapterBtn" disabled>◀ Prev</button>
+                <div class="reader-title-display">
+                    <div class="reader-chapter-title" id="readerChapterDisplay">Romans 8</div>
+                    <div class="reader-version-title" id="readerVersionDisplay">Modern English (Default)</div>
+                </div>
+                <button class="reader-nav-btn" id="nextChapterBtn" disabled>Next ▶</button>
+            </div>
+        </div>
+    </template>
 
     <script src="app.js"></script>
 </body>
