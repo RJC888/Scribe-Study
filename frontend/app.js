@@ -845,20 +845,20 @@ function displayAnalysis(content, analysisType, context) {
     }
 
 
-    // --- 4. APPEND FOOTER ---
-    const footerEl = document.createElement('div');
-    footerEl.className = 'analysis-footer';
-    
-    // Add version controls if it's a module
+    // --- 4. APPEND FOOTER (Only for Module Analysis) ---
     if (analysisType === 'module') {
+        const footerEl = document.createElement('div');
+        footerEl.className = 'analysis-footer';
+        
+        // Add version controls
         const versionControls = document.getElementById('versionControls').cloneNode(true);
         versionControls.style.display = 'flex';
         footerEl.appendChild(versionControls);
         // TODO: Hook up version button logic
         // updateVersionControls();
+        
+        DOMElements.analysisDisplay.appendChild(footerEl);
     }
-    
-    DOMElements.analysisDisplay.appendChild(footerEl);
     
     // Hide the initial status message
     DOMElements.statusMessage.classList.add('hidden');
