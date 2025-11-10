@@ -466,6 +466,12 @@
             display: block;
         }
 
+        /* This is the new anchor for the "smart header" */
+        .chapter-chunk {
+            padding-top: 1px; /* Ensures observer fires correctly */
+            margin-top: -1px; /* Resets layout */
+        }
+
         .analysis-content h1, .analysis-content h2, .analysis-content h3 {
             color: var(--evergreen);
             margin-top: 24px;
@@ -1040,11 +1046,13 @@
                 <!-- Initial/Error Status Message -->
                 <div class="status-message" id="statusMessage">
                     <div class="status-icon" id="statusIcon">✨</div>
-                    <div class="status-title" id="statusTitle">Ready to Study God's Word</div>
+                    <div class="status-title" id="statusTitle">Loading Bible Data...</div>
                     <p class="status-text" id="statusText">
-                        Enter your scripture passage above, then simply click a module tab. 
-                        Analysis generates automatically—streamlined for deep theological study.
+                        Please wait a moment...
                     </p>
+                    <div class="loading-dots">
+                        <span>.</span><span>.</span><span>.</span>
+                    </div>
                 </div>
 
                 <!-- Main Analysis Display (Hidden by default) -->
@@ -1077,7 +1085,7 @@
                     </div>
 
                     <!-- Main Content (Analysis or Scripture) -->
-                    <div class="analysis-content" id="analysisContent">
+                    <div classs="analysis-content" id="analysisContent">
                         <!-- Content injected by JS -->
                     </div>
 
