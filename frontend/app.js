@@ -1356,9 +1356,12 @@ function loadNotesFromFirestore() {
     }
 
     console.log("Setting up Firestore snapshot listener for notes...");
-    // We add orderBy here. This requires a composite index in Firestore,
-    // but it's the correct way to sort.
-    const q = query(AppState.notesCollectionRef, orderBy("updatedAt", "desc"));
+    
+    // ----- THIS IS THE FIX -----
+    // We remove `orderBy("updatedAt", "desc")` because it requires a Firestore index.
+    // The `renderNotesList` function already sorts the notes on the client-side.
+    const q = query(AppState.notesCollectionRef);
+    // ----- END OF FIX -----
 
     onSnapshot(q, (snapshot) => {
         console.log(`Received ${snapshot.docs.length} notes from Firestore.`);
