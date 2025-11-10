@@ -333,6 +333,12 @@
             color: var(--text-medium);
             z-index: 5;
             background: var(--parchment);
+            transition: opacity 0.3s;
+        }
+
+        .status-message.hidden {
+            display: none;
+            opacity: 0;
         }
 
         .analysis-display {
@@ -348,11 +354,12 @@
             display: flex;
             flex-direction: column;
             z-index: 10;
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
-        /* Hide analysis display by default */
-        .analysis-display:not(.visible) {
-            display: none;
+        .analysis-display.visible {
+            opacity: 1;
         }
 
 
@@ -887,10 +894,10 @@
         }
         
         /* New Scroll Loaders */
-        .scroll-loader-top, .scroll-loader-bottom {
-            display: none; /* Hidden by default */
+        .scroll-loader {
             padding: 20px;
             text-align: center;
+            display: none; /* Hide by default */
         }
 
     </style>
@@ -1006,10 +1013,11 @@
                         Display Scripture Text
                     </button>
                     <select class="version-select" id="versionSelect">
-                        <option value="Modern English">Modern English</option>
-                        <option value="KJV">King James (KJV)</option>
-                        <option value="WEB">World English (WEB)</option>
-                        <option value="Reina-Valera 1909">Spanish (RVR 1909)</option>
+                        <option value="KJV">KJV (English)</option>
+                        <option value="BBE">BBE (Basic English)</option>
+                        <option value="Reina-Valera 1909">Reina-Valera 1909 (Spanish)</option>
+                        <option value="WLC">Westminster Leningrad (Hebrew OT)</option>
+                        <option value="SBLGNT">SBLGNT (Greek NT)</option>
                     </select>
                 </div>
             </div>
@@ -1122,9 +1130,8 @@
     <!-- Reader Header Template -->
     <template id="readerHeaderTemplate">
         <div class="reader-controls" id="readerControlsDisplay">
-            <button class="reader-nav-btn" id="prevChapterBtn" disabled>◀ Prev</button>
+            <!-- Prev/Next buttons are gone -->
             <div class="reader-chapter-title" id="readerChapterDisplay"></div>
-            <button class="reader-nav-btn" id="nextChapterBtn">Next ▶</button>
         </div>
     </template>
     
