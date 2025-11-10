@@ -15,7 +15,6 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #4a5456;
             overflow: hidden;
-            font-size: 14px; /* Base font size */
         }
 
         :root {
@@ -90,7 +89,7 @@
         /* Main Container */
         .main-container {
             display: flex;
-            height: calc(100vh - 56px);
+            height: calc(100vh - 56px); /* 56px header height */
         }
 
         /* Sidebar */
@@ -136,6 +135,7 @@
 
         .sidebar-tab:hover {
             background: var(--pine);
+            right: -34px;
         }
 
         .sidebar-tab.active {
@@ -215,30 +215,24 @@
             display: flex;
             flex-direction: column;
             background: var(--parchment);
-            overflow: hidden; /* Prevent body scroll */
         }
 
-        /* --- Main Header Bar --- */
+        /* --- New Content Header --- */
         .content-header {
             background: var(--warm-white);
-            padding: 20px 32px;
+            padding: 24px 32px 20px;
             border-bottom: 1px solid var(--sand);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            align-items: center;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            position: relative;
-            z-index: 5;
+            z-index: 10;
         }
 
         .search-row {
-            display: flex;
-            gap: 16px;
-            align-items: center;
             width: 100%;
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-
-        .search-main {
-            flex: 1;
+            max-width: 900px;
         }
 
         .search-label {
@@ -249,17 +243,19 @@
             letter-spacing: 0.8px;
             margin-bottom: 8px;
             display: block;
+            text-align: center;
         }
 
         .search-input {
             width: 100%;
-            padding: 12px 16px;
+            padding: 14px 20px;
             border: 2px solid var(--sand);
             border-radius: 6px;
             font-size: 15px;
             color: var(--text-dark);
             background: white;
             transition: all 0.2s;
+            text-align: center;
         }
 
         .search-input:focus {
@@ -267,32 +263,31 @@
             border-color: var(--evergreen);
             box-shadow: 0 0 0 3px rgba(74, 93, 78, 0.1);
         }
-        
-        .search-input:disabled {
-            background: #f0f0f0;
-            cursor: not-allowed;
+
+        .search-input::placeholder {
+            color: var(--text-medium);
+            opacity: 0.8;
         }
 
         .action-bar {
             display: flex;
-            gap: 16px;
+            gap: 12px;
             width: 100%;
-            max-width: 1100px;
-            margin: 16px auto 0;
+            max-width: 900px;
         }
-
+        
         .action-btn {
             flex: 1;
-            padding: 12px 20px;
+            padding: 12px 24px;
             background: var(--evergreen);
             color: white;
             border: none;
             border-radius: 6px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            display: inline-flex;
+            display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
@@ -301,50 +296,67 @@
         .action-btn:hover:not(:disabled) {
             background: var(--pine);
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(74, 93, 78, 0.3);
+            box-shadow: 0 4px 12px rgba(74, 93, 78, 0.2);
         }
         
         .action-btn:disabled {
             background: var(--stone-light);
-            color: var(--stone);
+            color: var(--stone-dark);
+            opacity: 0.7;
             cursor: not-allowed;
         }
 
         .version-select {
             padding: 12px 14px;
-            border: 2px solid var(--evergreen);
+            border: 2px solid var(--sand);
             border-radius: 6px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             color: var(--text-dark);
             background: white;
             cursor: pointer;
             transition: all 0.2s;
+            min-width: 180px;
         }
         
+        .version-select:hover:not(:disabled) {
+            border-color: var(--evergreen);
+        }
+
         .version-select:disabled {
             background: #f0f0f0;
-            border-color: var(--sand);
-            color: var(--text-medium);
+            opacity: 0.7;
             cursor: not-allowed;
+        }
+        
+        .search-input:disabled {
+             background: #f0f0f0;
+             cursor: not-allowed;
         }
 
         /* --- Main Results Area --- */
         .results-main {
             flex: 1;
-            position: relative; /* For status message positioning */
-            overflow-y: scroll; /* <-- FIX: Was auto, now scroll */
-            padding: 0 32px 32px 32px; /* <-- FIX: Removed top padding */
+            overflow-y: scroll; /* <-- FIX: Force scrollbar */
+            position: relative;
         }
 
-        /* --- Status / Loading Message --- */
+        /* --- Status Message (Initial Load, Error) --- */
         .status-message {
             max-width: 900px;
-            margin: 0 auto;
+            margin: 40px auto 0;
             text-align: center;
             padding: 80px 40px;
             color: var(--text-medium);
+            background: white;
+            border: 1px solid var(--sand);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             display: block; /* Show by default */
+        }
+        
+        .analysis-display.hidden {
+            display: none;
         }
 
         .status-icon {
@@ -366,137 +378,138 @@
             margin: 0 auto;
         }
         
-        .loading-dots {
-            display: inline-flex;
-            gap: 4px;
-            margin-top: 20px;
-        }
-
-        .loading-dots span {
-            animation: loadingDot 1.4s infinite;
-            font-size: 24px;
-            color: var(--evergreen);
-        }
-
-        .loading-dots span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .loading-dots span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        /* --- Analysis Display --- */
+        /* --- Analysis Display (Hidden by default) --- */
         .analysis-display {
             max-width: 900px;
-            margin: 0 auto;
+            margin: 0 auto; /* No top margin */
             background: white;
+            border: 1px solid var(--sand);
+            border-left: 1px solid var(--sand);
+            border-right: 1px solid var(--sand);
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            border: 1px solid var(--sand);
+            min-height: 500px;
             display: none; /* Hide by default */
-            margin-top: 32px; /* Add margin back in */
-            overflow: hidden; /* To contain header */
+            margin-top: 40px; /* Re-add margin for when it's shown */
         }
 
-        /* Sticky Header for Analysis/Reader */
+        /* -- Header (Sticky) -- */
         .analysis-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 28px;
+            padding: 16px 28px;
             background: var(--warm-white);
             border-bottom: 1px solid var(--sand);
             position: sticky;
             top: 0;
-            z-index: 10;
+            z-index: 5;
         }
         
-        .analysis-title-display, .reader-controls-display {
+        .analysis-header.reader-mode {
+            padding-right: 16px;
+        }
+
+        .analysis-title, .reader-controls {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
             flex: 1;
-        }
-        
-        .analysis-icon-display {
-            font-size: 28px;
+            min-width: 0;
         }
 
-        .analysis-passage-display {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-dark);
+        .analysis-icon {
+            font-size: 24px;
         }
         
-        .analysis-module-display {
-            font-size: 14px;
-            color: var(--text-medium);
+        .analysis-passage {
+            font-size: 18px;
             font-weight: 600;
+            color: var(--text-dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-
-        .reader-title-display {
-            font-size: 18px;
+        
+        .analysis-module {
+            font-size: 11px;
             font-weight: 700;
+            color: var(--text-medium);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+        
+        .reader-title {
+            font-size: 18px;
+            font-weight: 600;
             color: var(--text-dark);
         }
 
         .font-controls {
             display: flex;
-            gap: 8px;
+            gap: 4px;
         }
-
+        
         .font-btn {
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             background: white;
-            border: 2px solid var(--sand);
-            color: var(--text-dark);
+            border: 1px solid var(--sand);
+            color: var(--text-medium);
             border-radius: 6px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
-            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
         }
         
         .font-btn:hover:not(:disabled) {
             background: var(--parchment);
             border-color: var(--evergreen);
+            color: var(--text-dark);
         }
-
+        
         .font-btn:disabled {
             opacity: 0.4;
             cursor: not-allowed;
         }
+        
+        .font-btn.increase {
+            font-size: 20px;
+        }
 
-        /* --- Main Content (Scrollable) --- */
+        /* -- Content -- */
         .analysis-content {
-            padding: 28px;
+            padding: 28px 48px 60px;
             line-height: 1.8;
             color: var(--text-dark);
             font-family: 'Georgia', serif;
-            font-size: 16px; /* Default */
+            font-size: 16px; /* Base size */
             transition: font-size 0.2s ease;
         }
         
         /* Font Size Classes */
-        .font-size-small { font-size: 14px; }
-        .font-size-normal { font-size: 16px; }
-        .font-size-large { font-size: 19px; }
-        .font-size-xlarge { font-size: 22px; }
+        .font-size-small { font-size: 14px; line-height: 1.7; }
+        .font-size-normal { font-size: 16px; line-height: 1.8; }
+        .font-size-large { font-size: 19px; line-height: 1.8; }
+        .font-size-xlarge { font-size: 22px; line-height: 1.9; }
 
         .analysis-content h1, .analysis-content h2, .analysis-content h3 {
             color: var(--evergreen);
             margin-top: 24px;
             margin-bottom: 12px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; /* FIX: Use sans-serif for headers */
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; /* Use UI font for headers */
         }
         
-        /* FIX: But make them Georgia if they are in the bible reader */
+        /* FIX: Make headers inside reader use Georgia font */
         .reader-mode .analysis-content h1,
         .reader-mode .analysis-content h2,
         .reader-mode .analysis-content h3 {
              font-family: 'Georgia', serif;
+             font-weight: bold;
         }
 
         .analysis-content h1 {
@@ -520,12 +533,10 @@
         .analysis-content ul, .analysis-content ol {
             margin-left: 24px;
             margin-bottom: 16px;
-            padding-left: 16px;
         }
 
         .analysis-content li {
             margin-bottom: 8px;
-            line-height: 1.7;
         }
 
         .analysis-content strong {
@@ -534,64 +545,74 @@
         }
         
         .analysis-content blockquote {
-            margin-left: 20px;
+            margin: 16px 0 16px 24px;
             padding-left: 16px;
-            border-left: 3px solid var(--sand);
-            color: var(--text-medium);
+            border-left: 3px solid var(--evergreen);
             font-style: italic;
-            margin-bottom: 16px;
+            color: var(--text-medium);
         }
         
-        .analysis-content br {
-            display: block;
-            content: "";
-            margin-top: 8px;
-        }
-        
-        /* Hide <p> tags that only contain a <br> */
-        .analysis-content p:has(br) {
-            margin-bottom: 0;
-        }
-        
-        /* Chapter Chunks (for Bible Reader) */
+        /* Reader-specific styles */
         .chapter-chunk {
-            padding-top: 16px;
-            border-top: 1px solid var(--sand);
-            margin-top: 16px;
+            padding-bottom: 24px;
         }
         
-        .chapter-chunk:first-child {
-            padding-top: 0;
-            border-top: none;
-            margin-top: 0;
-        }
-        
-        .chapter-chunk h1, .chapter-chunk h2, .chapter-chunk h3 {
-            font-size: 1.2em; /* Make headers blend in more */
-            font-weight: 700;
-            color: var(--text-dark);
-        }
-
-        /* Scroll Loaders */
         .scroll-loader {
             display: none;
+            padding: 40px;
             text-align: center;
-            padding: 20px;
-            font-size: 12px;
-            color: var(--text-medium);
-            font-weight: 600;
+        }
+        .scroll-loader .loading-dots span {
+             color: var(--evergreen);
+             font-size: 24px;
         }
 
+        /* -- Footer -- */
         .analysis-footer {
             padding: 16px 28px;
             background: var(--warm-white);
             border-top: 1px solid var(--sand);
             text-align: center;
-            font-size: 12px;
-            color: var(--text-medium);
-            display: none; /* Hide by default */
+            position: sticky;
+            bottom: 0;
+            z-index: 5;
         }
         
+        .version-controls {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .version-btn {
+            padding: 8px 16px;
+            background: white;
+            border: 2px solid var(--sand);
+            color: var(--text-dark);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .version-btn:hover:not(:disabled) {
+            background: var(--parchment);
+            border-color: var(--evergreen);
+        }
+
+        .version-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .version-indicator {
+            font-size: 12px;
+            color: var(--text-medium);
+            font-weight: 600;
+        }
+
         /* Notes Panel */
         .notes-panel {
             width: 400px;
@@ -645,13 +666,14 @@
 
         .notes-tab:hover {
             background: var(--pine);
+            left: -34px;
         }
 
         .notes-inner {
             display: flex;
             flex-direction: column;
             height: 100%;
-            overflow: hidden;
+            min-width: 400px; /* Stop content from shrinking */
         }
 
         .notes-panel.collapsed .notes-inner {
@@ -911,6 +933,25 @@
         }
 
         /* Loading Animation */
+        .loading-dots {
+            display: inline-flex;
+            gap: 4px;
+        }
+
+        .loading-dots span {
+            animation: loadingDot 1.4s infinite;
+            font-size: 24px;
+            color: var(--evergreen);
+        }
+
+        .loading-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
         @keyframes loadingDot {
             0%, 60%, 100% {
                 opacity: 0.3;
@@ -921,7 +962,6 @@
                 transform: translateY(-10px);
             }
         }
-        
     </style>
 </head>
 <body>
@@ -1016,86 +1056,102 @@
         <main class="content-area">
             <div class="content-header">
                 <div class="search-row">
-                    <div class="search-main">
-                        <label class="search-label" for="passageInput">Scripture Passage or General Question</label>
-                        <input 
-                            type="text" 
-                            class="search-input" 
-                            id="passageInput"
-                            placeholder="e.g., John 3:16, Romans 8:1-2, or 'What is propitiation?'"
-                            disabled
-                        >
-                    </div>
+                    <label class="search-label">Scripture Passage or General Question</label>
+                    <input 
+                        type="text" 
+                        class="search-input" 
+                        id="passageInput"
+                        placeholder="e.g., John 3:16, Romans 8, or 'What is propitiation?'"
+                        disabled 
+                    >
                 </div>
+                
                 <div class="action-bar">
                     <button class="action-btn" id="runModuleBtn" disabled>
-                        <span style="font-size: 18px;">🧠</span>
+                        <span style="font-size: 16px;">🧠</span>
                         Run Module Analysis
                     </button>
                     <button class="action-btn" id="displayScriptureBtn" disabled>
-                        <span style="font-size: 18px;">📖</span>
+                        <span style="font-size: 16px;">📖</span>
                         Display Scripture Text
                     </button>
                     <select class="version-select" id="versionSelect" disabled>
-                        <option value="KJV">KJV (English)</option>
-                        <option value="WEB">WEB (English)</option>
-                        <option value="RVR1909">Reina-Valera 1909 (Spanish)</option>
-                        <option value="WLC">WLC (Hebrew OT)</option>
-                        <option valueRe="SBLGNT">SBLGNT (Greek NT)</option>
+                        <option value="KJV (English)">KJV (English)</option>
+                        <option value="WEB (English)">WEB (English)</option>
+                        <option value="BBE (Basic English)">BBE (Basic English)</option>
+                        <option value="Reina-Valera 1909 (Spanish)">Reina-Valera 1909 (Spanish)</option>
+                        <option value="Westminster Leningrad Codex (Hebrew OT)">WLC (Hebrew OT)</option>
+                        <option value="SBLGNT (Greek NT)">SBLGNT (Greek NT)</option>
                     </select>
                 </div>
             </div>
 
             <div class="results-main" id="resultsMain">
-                
-                <!-- Status Message (Default) -->
+            
+                <!-- Status Message (Initial Load, Error) -->
                 <div class="status-message" id="statusMessage">
-                    <div class="status-icon" id="statusIcon">📖</div>
-                    <div class="status-title" id="statusTitle">Loading Bible Data...</div>
-                    <p class="status-text" id="statusText">
-                        Please wait a moment.
-                    </p>
-                    <div class="loading-dots">
-                        <span>.</span><span>.</span><span>.</span>
+                    <div class="status-icon" id="statusIcon">
+                        <div class="loading-dots">
+                            <span>.</span><span>.</span><span>.</span>
+                        </div>
                     </div>
+                    <div class="status-title" id="statusTitle">Loading Bible Data...</div>
+                    <p class="status-text" id="statusText">Please wait a moment.</p>
                 </div>
-
+                
                 <!-- Analysis Display (Hidden by default) -->
                 <div class="analysis-display" id="analysisDisplay">
+                
                     <!-- Sticky Header -->
                     <div class="analysis-header">
                         
                         <!-- Module Title -->
-                        <div class="analysis-title-display" id="analysisTitleDisplay">
-                            <span class="analysis-icon-display" id="analysisIconDisplay">📖</span>
+                        <div class="analysis-title" id="analysisTitleDisplay">
+                            <span class="analysis-icon" id="analysisIconDisplay">📖</span>
                             <div>
-                                <div class="analysis-passage-display" id="analysisPassageDisplay">John 1:14</div>
-                                <div class="analysis-module-display" id="analysisModuleDisplay">Spiritual Analysis</div>
+                                <div class="analysis-passage" id="analysisPassageDisplay">John 1:1</div>
+                                <div class="analysis-module" id="analysisModuleDisplay">Spiritual Analysis</div>
                             </div>
                         </div>
-
-                        <!-- Bible Reader Title -->
-                        <div class="reader-controls-display" id="readerControlsDisplay">
-                            <span class="reader-title-display" id="readerTitleDisplay">John 1</span>
+                        
+                        <!-- Reader Title (Hidden by default) -->
+                        <div class="reader-controls" id="readerControlsDisplay" style="display: none;">
+                            <span class="reader-title" id="readerTitleDisplay">Romans 8</span>
                         </div>
                         
                         <!-- Font Controls -->
                         <div class="font-controls">
-                            <button class="font-btn" id="fontDecreaseBtn" data-tooltip="Decrease font size">A-</button>
-                            <button class="font-btn" id="fontIncreaseBtn" data-tooltip="Increase font size">A+</button>
+                            <button class="font-btn decrease" id="fontDecreaseBtn" data-tooltip="Smaller Text">A-</button>
+                            <button class="font-btn increase" id="fontIncreaseBtn" data-tooltip="Larger Text">A+</button>
                         </div>
                     </div>
-
-                    <!-- Scrollable Content -->
-                    <div class="scroll-loader" id="scrollLoaderTop">Loading previous chapter...</div>
-                    <div class="analysis-content" id="analysisContent">
-                        <!-- Content is injected here -->
-                    </div>
-                    <div class="scroll-loader" id="scrollLoaderBottom">Loading next chapter...</div>
                     
-                    <!-- Footer -->
-                    <div class="analysis-footer" id="analysisFooter">
-                        Analysis complete.
+                    <!-- Scrollable Content -->
+                    <div class->
+                        <div class="scroll-loader" id="scrollLoaderTop">
+                            <div class="loading-dots">
+                                <span>.</span><span>.</span><span>.</span>
+                            </div>
+                        </div>
+                        
+                        <div id="analysisContent">
+                            <!-- Content injected here by JS -->
+                        </div>
+                        
+                        <div class="scroll-loader" id="scrollLoaderBottom">
+                            <div class="loading-dots">
+                                <span>.</span><span>.</span><span>.</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sticky Footer (for versions, etc.) -->
+                    <div class="analysis-footer" id="analysisFooter" style="display: none;">
+                        <div class="version-controls" id="versionControls">
+                            <button class="version-btn" id="prevVersionBtn" disabled>◀ Previous</button>
+                            <span class="version-indicator" id="versionIndicator">Version 1 of 1</span>
+                            <button class="version-btn" id="nextVersionBtn" disabled>Next ▶</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1120,7 +1176,7 @@
                     </div>
 
                     <div class="note-name-section">
-                        <label class="note-name-label" for="noteNameInput">Note Name</label>
+                        <label class="note-name-label">Note Name</label>
                         <input 
                             type="text" 
                             class="note-name-input" 
