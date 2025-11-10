@@ -73,7 +73,7 @@ const BIBLE_DATA = {
         {"name": "1 Peter", "abbr": "1Pet", "chapters": 5, "verses": [25,25,22,19,14]},
         {"name": "2 Peter", "abbr": "2Pet", "chapters": 3, "verses": [21,22,18]},
         {"name": "1 John", "abbr": "1John", "chapters": 5, "verses": [10,29,24,21,21]},
-        {"name":ReadMe.md": "2John", "chapters": 1, "verses": [13]},
+        {"name": "2 John", "abbr": "2John", "chapters": 1, "verses": [13]},
         {"name": "3 John", "abbr": "3John", "chapters": 1, "verses": [14]},
         {"name": "Jude", "abbr": "Jude", "chapters": 1, "verses": [25]},
         {"name": "Revelation", "abbr": "Rev", "chapters": 22, "verses": [20,29,22,11,14,17,17,13,21,11,19,17,18,20,8,21,18,24,21,15,27,21]}
@@ -601,6 +601,13 @@ function displayScripture() {
     AppState.currentPassage = passage;
     AppState.currentReaderMode = true;
 
+    // Clear existing content and observer
+    const content = document.getElementById('analysisContent');
+    content.innerHTML = '';
+    if (AppState.chapterObserver) {
+        AppState.chapterObserver.disconnect();
+    }
+
     // Fetch this chapter
     fetchAndDisplayChapter(ref, false);
 }
@@ -682,14 +689,14 @@ Format verses with numbers in brackets, like [1] [2] [3].`;
         // Create a new "chunk" for this chapter
         const chunk = createChapterChunk(formatted, ref.book, ref.chapter);
         
+        const resultsMain = document.getElementById('resultsMain');
+        const oldScrollHeight = resultsMain.scrollHeight; // Store old height
+        
         if (prepend) {
-            const firstChild = content.firstChild;
             content.prepend(chunk);
-            if (firstChild) {
-                // Restore scroll position so it doesn't jump
-                const chunkHeight = chunk.offsetHeight;
-                resultsMain.scrollTop = chunkHeight;
-            }
+            // Restore scroll position so it doesn't jump
+            const newScrollHeight = resultsMain.scrollHeight;
+            resultsMain.scrollTop = newScrollHeight - oldScrollHeight;
         } else {
             content.appendChild(chunk);
         }
@@ -843,7 +850,9 @@ function displayAnalysis(analysis, analysisType, data) {
         // by fetchAndDisplayChapter. We just need to scroll to it.
         if (analysis === null) {
             // Find the verse anchor
-            const verseEl = document.getElementById(`v${ref.book.replace(/\s/g, '_')}-${ref.chapter}-${ref.verse}`);
+            const verseId = `v${ref.book.replace(/\s/g, '_')}-${ref.chapter}-${ref.verse}`;
+            const verseEl = document.getElementById(verseId);
+            
             if (verseEl) {
                 // Scroll to the verse
                 verseEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -901,7 +910,7 @@ function displayAnalysis(analysis, analysisType, data) {
 /**
  * Creates a standard "chunk" of HTML for a chapter
  * @param {string} htmlContent - The formatted HTML of the chapter
- * @param {string} book - The book name (e.g., "John")
+ *I * @param {string} book - The book name (e.g., "John")
  * @param {string} chapter - The chapter number (e.g., 1)
  * @returns {HTMLElement} A div element
  */
@@ -1123,8 +1132,16 @@ function loadAdjacentChapter(direction) {
     
     // Not loaded, so fetch it
     AppState.isFetchingChapter = true;
+    // Detach scroll listener to prevent loops
+    document.getElementById('resultsMain').removeEventListener('scroll', scrollHandler);
+    
     AppState.currentBibleReference = nextRef; // Update state
-    fetchAndDisplayChapter(nextRef, (direction === -1), true);
+    
+    // Asynchronously fetch and then re-attach listener
+    fetchAndDisplayChapter(nextRef, (direction === -1), true).then(() => {
+        // Re-attach listener after content is added
+        document.getElementById('resultsMain').addEventListener('scroll', scrollHandler);
+    });
 }
 
 // ===== SCRIPTURE PASSAGE PARSING =====
@@ -1152,19 +1169,17 @@ function parsePassageReference(passage) {
     const verse = match[3] ? parseInt(match[3], 10) : 1;
     
     // Find the canonical book name
-    const bookData = AppState.bibleStructure.bookMap.get(bookInput);
+    let bookData = AppState.bibleStructure.bookMap.get(bookInput);
     
     if (!bookData) {
         // Try partial match, e.g., "rom" for "Romans"
         const partialMatch = Array.from(AppState.bibleStructure.bookMap.keys())
             .find(key => key.startsWith(bookInput));
         if (partialMatch) {
-            const bookDataPartial = AppState.bibleStructure.bookMap.get(partialMatch);
-            if (bookDataPartial && chapter <= bookDataPartial.chapters) {
-                return { book: bookDataPartial.name, chapter, verse };
-            }
+            bookData = AppState.bibleStructure.bookMap.get(partialMatch);
+        } else {
+            return null; // No book found
         }
-        return null; // No book found
     }
 
     // Check if chapter is valid
@@ -1183,8 +1198,13 @@ function parsePassageReference(passage) {
 function loadNotes() {
     const saved = localStorage.getItem('scribeNotes');
     if (saved) {
-        AppState.notes = JSON.parse(saved);
-        updateNoteCount();
+        try {
+            AppState.notes = JSON.parse(saved);
+            updateNoteCount();
+        } catch (e) {
+            console.error("Could not parse notes from localStorage", e);
+            AppState.notes = {};
+        }
     }
 }
 
@@ -1217,6 +1237,7 @@ function loadNoteIntoEditor(noteId) {
     document.getElementById('noteNameInput').value = note.title;
     document.getElementById('notesEditor').value = note.content;
     updateNoteMeta(note);
+    updateWordCount();
 }
 
 function saveCurrentNote() {
@@ -1243,7 +1264,7 @@ function deleteCurrentNote() {
     if (!AppState.currentNoteId) return;
     
     // Simple confirm, replace with modal later
-    if (confirm("Are you sure you want to delete this note?")) {
+    if (window.confirm("Are you sure you want to delete this note?")) {
         delete AppState.notes[AppState.currentNoteId];
         saveNotes();
         
@@ -1290,4 +1311,5 @@ function setSaveStatus(status) {
 function debounce(func, delay) {
     let timeout;
     return function(...args) {
-        const context =
+        const context = this;
+        clearTimeout(timeout);
