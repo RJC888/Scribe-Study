@@ -1,102 +1,139 @@
+// ===== FIREBASE IMPORTS =====
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import {
+    getAuth,
+    signInAnonymously,
+    signInWithCustomToken,
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import {
+    getFirestore,
+    collection,
+    addDoc,
+    doc,
+    deleteDoc,
+    setDoc,
+    onSnapshot,
+    query,
+    orderBy,
+    serverTimestamp,
+    setLogLevel
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
 // ===== SCRIBE STUDY FRONTEND =====
 // BUNDLED BIBLE DATA: Fixes loading errors and race conditions.
 
 // ===== BIBLE STRUCTURE DATA =====
 // This is the entire 'bible-structure.json' file, embedded to prevent loading errors.
 const BIBLE_DATA = {
-  "testament": {
-    "old": {
-      "books": [
-        {"name": "Genesis", "abbr": "Gen", "chapters": 50, "verses": [31,25,24,26,32,22,24,22,29,32,32,20,18,24,21,16,27,33,38,18,34,24,20,67,34,35,46,22,35,43,55,32,20,31,29,43,36,30,23,23,57,38,34,34,28,34,31,22,33,26]},
-        {"name": "Exodus", "abbr": "Exod", "chapters": 40, "verses": [22,25,22,31,23,30,25,32,35,29,10,51,22,31,27,36,16,27,25,26,36,31,33,18,40,37,21,43,46,38,18,35,23,35,35,38,29,31,43,38]},
-        {"name": "Leviticus", "abbr": "Lev", "chapters": 27, "verses": [17,16,17,35,19,30,38,36,24,20,47,8,59,57,33,34,16,30,37,27,24,33,44,23,55,46,34]},
-        {"name": "Numbers", "abbr": "Num", "chapters": 36, "verses": [54,34,51,49,31,27,89,26,23,36,35,16,33,45,41,50,13,32,22,29,35,41,30,25,18,65,23,31,40,16,54,42,56,29,34,13]},
-        {"name": "Deuteronomy", "abbr": "Deut", "chapters": 34, "verses": [46,37,29,49,33,25,26,20,29,22,32,32,18,29,23,22,20,22,21,20,23,30,25,22,19,19,26,68,29,20,30,52,29,12]},
-        {"name": "Joshua", "abbr": "Josh", "chapters": 24, "verses": [18,24,17,24,15,27,26,35,27,43,23,24,33,15,63,10,18,28,51,9,45,34,16,33]},
-        {"name": "Judges", "abbr": "Judg", "chapters": 21, "verses": [36,23,31,24,31,40,25,35,57,18,40,15,25,20,20,31,13,31,30,48,25]},
-        {"name": "Ruth", "abbr": "Ruth", "chapters": 4, "verses": [22,23,18,22]},
-        {"name": "1 Samuel", "abbr": "1Sam", "chapters": 31, "verses": [28,36,21,22,12,21,17,22,27,27,15,25,23,52,35,23,58,30,24,42,15,23,29,22,44,25,12,25,11,31,13]},
-        {"name": "2 Samuel", "abbr": "2Sam", "chapters": 24, "verses": [27,32,39,12,25,23,29,18,13,19,27,31,39,33,37,23,29,33,43,26,22,51,39,25]},
-        {"name": "1 Kings", "abbr": "1Kgs", "chapters": 22, "verses": [53,46,28,34,18,38,51,66,28,29,43,33,34,31,34,34,24,46,21,43,29,53]},
-        {"name": "2 Kings", "abbr": "2Kgs", "chapters": 25, "verses": [18,25,27,44,27,33,20,29,37,36,21,21,25,29,38,20,41,37,37,20,21,26,20,37,20,30]},
-        {"name": "1 Chronicles", "abbr": "1Chr", "chapters": 29, "verses": [54,55,24,43,26,81,40,40,44,14,47,40,14,17,29,43,27,17,19,8,30,19,32,31,31,32,34,21,30]},
-        {"name": "2 Chronicles", "abbr": "2Chr", "chapters": 36, "verses": [17,18,17,22,14,42,22,18,31,19,23,16,22,15,19,14,19,34,11,37,20,12,21,27,28,23,9,27,36,27,21,33,25,33,27,23]},
-        {"name": "Ezra", "abbr": "Ezra", "chapters": 10, "verses": [11,70,13,24,17,22,28,36,15,44]},
-        {"name": "Nehemiah", "abbr": "Neh", "chapters": 13, "verses": [11,20,32,23,19,19,73,18,38,39,36,47,31]},
-        {"name": "Esther", "abbr": "Esth", "chapters": 10, "verses": [22,23,15,17,14,14,10,17,32,3]},
-        {"name": "Job", "abbr": "Job", "chapters": 42, "verses": [22,13,26,21,27,30,21,22,35,22,20,25,28,22,35,22,16,21,29,29,34,30,17,25,6,14,23,28,25,31,40,22,33,37,16,33,24,41,30,24,34,17]},
-        {"name": "Psalms", "abbr": "Ps", "chapters": 150, "verses": [6,12,8,8,12,10,17,9,20,18,7,8,6,7,5,11,15,50,14,9,13,31,6,10,22,12,14,9,11,12,24,11,22,22,28,12,40,22,13,17,13,11,5,26,17,11,9,14,20,23,19,9,6,7,23,13,11,11,17,12,8,12,11,10,13,20,7,35,36,5,24,20,28,23,10,12,20,72,13,19,16,8,18,12,13,17,7,18,52,17,16,15,5,23,11,13,12,9,9,5,8,28,22,35,45,48,43,13,31,7,10,10,9,8,18,19,2,29,176,7,8,9,4,8,5,6,5,6,8,8,3,18,3,3,21,26,9,8,24,13,10,7,12,15,21,10,20,14,9,6]},
-        {"name": "Proverbs", "abbr": "Prov", "chapters": 31, "verses": [33,22,35,27,23,35,27,36,18,32,31,28,25,35,33,33,28,24,29,30,31,29,35,34,28,28,27,28,27,33,31]},
-        {"name": "Ecclesiastes", "abbr": "Eccl", "chapters": 12, "verses": [18,26,22,16,20,12,29,17,18,20,10,14]},
-        {"name": "Song of Solomon", "abbr": "Song", "chapters": 8, "verses": [17,17,11,16,16,13,13,14]},
-        {"name": "Isaiah", "abbr": "Isa", "chapters": 66, "verses": [31,22,26,6,30,13,25,22,21,34,16,6,22,32,9,14,14,7,25,6,17,25,18,23,12,21,13,29,24,33,9,20,24,17,10,22,38,22,8,31,29,25,28,28,25,13,15,22,26,11,23,15,12,17,13,12,21,14,21,22,11,12,19,12,25,24]},
-        {"name": "Jeremiah", "abbr": "Jer", "chapters": 52, "verses": [19,37,25,31,31,30,34,22,26,25,23,17,27,22,21,21,27,23,15,18,14,30,40,10,38,24,22,17,32,24,40,44,26,22,19,32,21,28,18,16,18,22,13,30,5,28,7,47,39,46,64,34]},
-        {"name": "Lamentations", "abbr": "Lam", "chapters": 5, "verses": [22,22,66,22,22]},
-        {"name": "Ezekiel", "abbr": "Ezek", "chapters": 48, "verses": [28,10,27,17,17,14,27,18,11,22,25,28,23,23,8,63,24,32,14,49,32,31,49,27,17,21,36,26,21,26,18,32,33,31,15,38,28,23,29,49,26,20,27,31,25,24,23,35]},
-        {"name": "Daniel", "abbr": "Dan", "chapters": 12, "verses": [21,49,30,37,31,28,28,27,27,21,45,13]},
-        {"name": "Hosea", "abbr": "Hos", "chapters": 14, "verses": [11,23,5,19,15,11,16,14,17,15,12,14,16,9]},
-        {"name": "Joel", "abbr": "Joel", "chapters": 3, "verses": [20,32,21]},
-        {"name": "Amos", "abbr": "Amos", "chapters": 9, "verses": [15,16,15,13,27,14,17,14,15]},
-        {"name": "Obadiah", "abbr": "Obad", "chapters": 1, "verses": [21]},
-        {"name": "Jonah", "abbr": "Jonah", "chapters": 4, "verses": [17,10,10,11]},
-        {"name": "Micah", "abbr": "Mic", "chapters": 7, "verses": [16,13,12,13,15,16,20]},
-        {"name": "Nahum", "abbr": "Nah", "chapters": 3, "verses": [15,13,19]},
-        {"name": "Habakkuk", "abbr": "Hab", "chapters": 3, "verses": [17,20,19]},
-        {"name": "Zephaniah", "abbr": "Zeph", "chapters": 3, "verses": [18,15,20]},
-        {"name": "Haggai", "abbr": "Hag", "chapters": 2, "verses": [15,23]},
-        {"name": "Zechariah", "abbr": "Zech", "chapters": 14, "verses": [21,13,10,14,11,15,14,23,17,12,17,14,9,21]},
-        {"name": "Malachi", "abbr": "Mal", "chapters": 4, "verses": [14,17,18,6]}
-      ]
-    },
-    "new": {
-      "books": [
-        {"name": "Matthew", "abbr": "Matt", "chapters": 28, "verses": [25,23,17,25,48,34,29,34,38,42,30,50,58,36,39,28,27,35,30,34,46,46,39,51,46,75,66,20]},
-        {"name": "Mark", "abbr": "Mark", "chapters": 16, "verses": [45,28,35,41,43,56,37,38,50,52,33,44,37,72,47,20]},
-        {"name": "Luke", "abbr": "Luke", "chapters": 24, "verses": [80,52,38,44,39,49,50,56,62,42,54,59,35,35,32,31,37,43,48,47,38,71,56,53]},
-        {"name": "John", "abbr": "John", "chapters": 21, "verses": [51,25,36,54,47,71,53,59,41,42,57,50,38,31,27,33,26,40,42,31,25]},
-        {"name": "Acts", "abbr": "Acts", "chapters": 28, "verses": [26,47,26,37,42,15,60,40,43,48,30,25,52,28,41,40,34,28,41,38,40,30,35,27,27,32,44,31]},
-        {"name": "Romans", "abbr": "Rom", "chapters": 16, "verses": [32,29,31,25,21,23,25,39,33,21,36,21,14,23,33,27]},
-        {"name": "1 Corinthians", "abbr": "1Cor", "chapters": 16, "verses": [31,16,23,21,13,20,40,13,27,33,34,31,13,40,58,24]},
-        {"name": "2 Corinthians", "abbr": "2Cor", "chapters": 13, "verses": [24,17,18,18,21,18,16,24,15,18,33,21,14]},
-        {"name": "Galatians", "abbr": "Gal", "chapters": 6, "verses": [24,21,29,31,26,18]},
-        {"name": "Ephesians", "abbr": "Eph", "chapters": 6, "verses": [23,22,21,32,33,24]},
-        {"name": "Philippians", "abbr": "Phil", "chapters": 4, "verses": [30,30,21,23]},
-        {"name": "Colossians", "abbr": "Col", "chapters": 4, "verses": [29,23,25,18]},
-        {"name": "1 Thessalonians", "abbr": "1Thess", "chapters": 5, "verses": [10,20,13,18,28]},
-        {"name": "2 Thessalonians", "abbr": "2Thess", "chapters": 3, "verses": [12,17,18]},
-        {"name": "1 Timothy", "abbr": "1Tim", "chapters": 6, "verses": [20,15,16,16,25,21]},
-        {"name": "2 Timothy", "abbr": "2Tim", "chapters": 4, "verses": [18,26,17,22]},
-        {"name": "Titus", "abbr": "Titus", "chapters": 3, "verses": [16,15,15]},
-        {"name": "Philemon", "abbr": "Phlm", "chapters": 1, "verses": [25]},
-        {"name": "Hebrews", "abbr": "Heb", "chapters": 13, "verses": [14,18,19,16,14,20,28,13,28,39,40,29,25]},
-        {"name": "James", "abbr": "Jas", "chapters": 5, "verses": [27,26,18,17,20]},
-        {"name": "1 Peter", "abbr": "1Pet", "chapters": 5, "verses": [25,25,22,19,14]},
-        {"name": "2 Peter", "abbr": "2Pet", "chapters": 3, "verses": [21,22,18]},
-        {"name": "1 John", "abbr": "1John", "chapters": 5, "verses": [10,29,24,21,21]},
-        {"name": "2 John", "abbr": "2John", "chapters": 1, "verses": [13]},
-        {"name": "3 John", "abbr": "3John", "chapters": 1, "verses": [14]},
-        {"name": "Jude", "abbr": "Jude", "chapters": 1, "verses": [25]},
-        {"name": "Revelation", "abbr": "Rev", "chapters": 22, "verses": [20,29,22,11,14,17,17,13,21,11,19,17,18,20,8,21,18,24,21,15,27,21]}
-      ]
+    "testament": {
+        "old": {
+            "books": [
+                {"name": "Genesis", "abbr": "Gen", "chapters": 50, "verses": [31,25,24,26,32,22,24,22,29,32,32,20,18,24,21,16,27,33,38,18,34,24,20,67,34,35,46,22,35,43,55,32,20,31,29,43,36,30,23,23,57,38,34,34,28,34,31,22,33,26]},
+                {"name": "Exodus", "abbr": "Exod", "chapters": 40, "verses": [22,25,22,31,23,30,25,32,35,29,10,51,22,31,27,36,16,27,25,26,36,31,33,18,40,37,21,43,46,38,18,35,23,35,35,38,29,31,43,38]},
+                {"name": "Leviticus", "abbr": "Lev", "chapters": 27, "verses": [17,16,17,35,19,30,38,36,24,20,47,8,59,57,33,34,16,30,37,27,24,33,44,23,55,46,34]},
+                {"name": "Numbers", "abbr": "Num", "chapters": 36, "verses": [54,34,51,49,31,27,89,26,23,36,35,16,33,45,41,50,13,32,22,29,35,41,30,25,18,65,23,31,40,16,54,42,56,29,34,13]},
+                {"name": "Deuteronomy", "abbr": "Deut", "chapters": 34, "verses": [46,37,29,49,33,25,26,20,29,22,32,32,18,29,23,22,20,22,21,20,23,30,25,22,19,19,26,68,29,20,30,52,29,12]},
+                {"name": "Joshua", "abbr": "Josh", "chapters": 24, "verses": [18,24,17,24,15,27,26,35,27,43,23,24,33,15,63,10,18,28,51,9,45,34,16,33]},
+                {"name": "Judges", "abbr": "Judg", "chapters": 21, "verses": [36,23,31,24,31,40,25,35,57,18,40,15,25,20,20,31,13,31,30,48,25]},
+                {"name": "Ruth", "abbr": "Ruth", "chapters": 4, "verses": [22,23,18,22]},
+                {"name": "1 Samuel", "abbr": "1Sam", "chapters": 31, "verses": [28,36,21,22,12,21,17,22,27,27,15,25,23,52,35,23,58,30,24,42,15,23,29,22,44,25,12,25,11,31,13]},
+                {"name": "2 Samuel", "abbr": "2Sam", "chapters": 24, "verses": [27,32,39,12,25,23,29,18,13,19,27,31,39,33,37,23,29,33,43,26,22,51,39,25]},
+                {"name": "1 Kings", "abbr": "1Kgs", "chapters": 22, "verses": [53,46,28,34,18,38,51,66,28,29,43,33,34,31,34,34,24,46,21,43,29,53]},
+                {"name": "2 Kings", "abbr": "2Kgs", "chapters": 25, "verses": [18,25,27,44,27,33,20,29,37,36,21,21,25,29,38,20,41,37,37,20,21,26,20,37,20,30]},
+                {"name": "1 Chronicles", "abbr": "1Chr", "chapters": 29, "verses": [54,55,24,43,26,81,40,40,44,14,47,40,14,17,29,43,27,17,19,8,30,19,32,31,31,32,34,21,30]},
+                {"name": "2 Chronicles", "abbr": "2Chr", "chapters": 36, "verses": [17,18,17,22,14,42,22,18,31,19,23,16,22,15,19,14,19,34,11,37,20,12,21,27,28,23,9,27,36,27,21,33,25,33,27,23]},
+                {"name": "Ezra", "abbr": "Ezra", "chapters": 10, "verses": [11,70,13,24,17,22,28,36,15,44]},
+                {"name": "Nehemiah", "abbr": "Neh", "chapters": 13, "verses": [11,20,32,23,19,19,73,18,38,39,36,47,31]},
+                {"name": "Esther", "abbr": "Esth", "chapters": 10, "verses": [22,23,15,17,14,14,10,17,32,3]},
+                {"name": "Job", "abbr": "Job", "chapters": 42, "verses": [22,13,26,21,27,30,21,22,35,22,20,25,28,22,35,22,16,21,29,29,34,30,17,25,6,14,23,28,25,31,40,22,33,37,16,33,24,41,30,24,34,17]},
+                {"name": "Psalms", "abbr": "Ps", "chapters": 150, "verses": [6,12,8,8,12,10,17,9,20,18,7,8,6,7,5,11,15,50,14,9,13,31,6,10,22,12,14,9,11,12,24,11,22,22,28,12,40,22,13,17,13,11,5,26,17,11,9,14,20,23,19,9,6,7,23,13,11,11,17,12,8,12,11,10,13,20,7,35,36,5,24,20,28,23,10,12,20,72,13,19,16,8,18,12,13,17,7,18,52,17,16,15,5,23,11,13,12,9,9,5,8,28,22,35,45,48,43,13,31,7,10,10,9,8,18,19,2,29,176,7,8,9,4,8,5,6,5,6,8,8,3,18,3,3,21,26,9,8,24,13,10,7,12,15,21,10,20,14,9,6]},
+                {"name": "Proverbs", "abbr": "Prov", "chapters": 31, "verses": [33,22,35,27,23,35,27,36,18,32,31,28,25,35,33,33,28,24,29,30,31,29,35,34,28,28,27,28,27,33,31]},
+                {"name": "Ecclesiastes", "abbr": "Eccl", "chapters": 12, "verses": [18,26,22,16,20,12,29,17,18,20,10,14]},
+                {"name": "Song of Solomon", "abbr": "Song", "chapters": 8, "verses": [17,17,11,16,16,13,13,14]},
+                {"name": "Isaiah", "abbr": "Isa", "chapters": 66, "verses": [31,22,26,6,30,13,25,22,21,34,16,6,22,32,9,14,14,7,25,6,17,25,18,23,12,21,13,29,24,33,9,20,24,17,10,22,38,22,8,31,29,25,28,28,25,13,15,22,26,11,23,15,12,17,13,12,21,14,21,22,11,12,19,12,25,24]},
+                {"name": "Jeremiah", "abbr": "Jer", "chapters": 52, "verses": [19,37,25,31,31,30,34,22,26,25,23,17,27,22,21,21,27,23,15,18,14,30,40,10,38,24,22,17,32,24,40,44,26,22,19,32,21,28,18,16,18,22,13,30,5,28,7,47,39,46,64,34]},
+                {"name": "Lamentations", "abbr": "Lam", "chapters": 5, "verses": [22,22,66,22,22]},
+                {"name": "Ezekiel", "abbr": "Ezek", "chapters": 48, "verses": [28,10,27,17,17,14,27,18,11,22,25,28,23,23,8,63,24,32,14,49,32,31,49,27,17,21,36,26,21,26,18,32,33,31,15,38,28,23,29,49,26,20,27,31,25,24,23,35]},
+                {"name": "Daniel", "abbr": "Dan", "chapters": 12, "verses": [21,49,30,37,31,28,28,27,27,21,45,13]},
+                {"name": "Hosea", "abbr": "Hos", "chapters": 14, "verses": [11,23,5,19,15,11,16,14,17,15,12,14,16,9]},
+                {"name": "Joel", "abbr": "Joel", "chapters": 3, "verses": [20,32,21]},
+                {"name": "Amos", "abbr": "Amos", "chapters": 9, "verses": [15,16,15,13,27,14,17,14,15]},
+                {"name": "Obadiah", "abbr": "Obad", "chapters": 1, "verses": [21]},
+                {"name": "Jonah", "abbr": "Jonah", "chapters": 4, "verses": [17,10,10,11]},
+                {"name": "Micah", "abbr": "Mic", "chapters": 7, "verses": [16,13,12,13,15,16,20]},
+                {"name": "Nahum", "abbr": "Nah", "chapters": 3, "verses": [15,13,19]},
+                {"name": "Habakkuk", "abbr": "Hab", "chapters": 3, "verses": [17,20,19]},
+                {"name": "Zephaniah", "abbr": "Zeph", "chapters": 3, "verses": [18,15,20]},
+                {"name": "Haggai", "abbr": "Hag", "chapters": 2, "verses": [15,23]},
+                {"name": "Zechariah", "abbr": "Zech", "chapters": 14, "verses": [21,13,10,14,11,15,14,23,17,12,17,14,9,21]},
+                {"name": "Malachi", "abbr": "Mal", "chapters": 4, "verses": [14,17,18,6]}
+            ]
+        },
+        "new": {
+            "books": [
+                {"name": "Matthew", "abbr": "Matt", "chapters": 28, "verses": [25,23,17,25,48,34,29,34,38,42,30,50,58,36,39,28,27,35,30,34,46,46,39,51,46,75,66,20]},
+                {"name": "Mark", "abbr": "Mark", "chapters": 16, "verses": [45,28,35,41,43,56,37,38,50,52,33,44,37,72,47,20]},
+                {"name": "Luke", "abbr": "Luke", "chapters": 24, "verses": [80,52,38,44,39,49,50,56,62,42,54,59,35,35,32,31,37,43,48,47,38,71,56,53]},
+                {"name": "John", "abbr": "John", "chapters": 21, "verses": [51,25,36,54,47,71,53,59,41,42,57,50,38,31,27,33,26,40,42,31,25]},
+                {"name": "Acts", "abbr": "Acts", "chapters": 28, "verses": [26,47,26,37,42,15,60,40,43,48,30,25,52,28,41,40,34,28,41,38,40,30,35,27,27,32,44,31]},
+                {"name": "Romans", "abbr": "Rom", "chapters": 16, "verses": [32,29,31,25,21,23,25,39,33,21,36,21,14,23,33,27]},
+                {"name": "1 Corinthians", "abbr": "1Cor", "chapters": 16, "verses": [31,16,23,21,13,20,40,13,27,33,34,31,13,40,58,24]},
+                {"name": "2 Corinthians", "abbr": "2Cor", "chapters": 13, "verses": [24,17,18,18,21,18,16,24,15,18,33,21,14]},
+                {"name": "Galatians", "abbr": "Gal", "chapters": 6, "verses": [24,21,29,31,26,18]},
+                {"name": "Ephesians", "abbr": "Eph", "chapters": 6, "verses": [23,22,21,32,33,24]},
+                {"name": "Philippians", "abbr": "Phil", "chapters": 4, "verses": [30,30,21,23]},
+                {"name": "Colossians", "abbr": "Col", "chapters": 4, "verses": [29,23,25,18]},
+                {"name": "1 Thessalonians", "abbr": "1Thess", "chapters": 5, "verses": [10,20,13,18,28]},
+                {"name": "2 Thessalonians", "abbr": "2Thess", "chapters": 3, "verses": [12,17,18]},
+                {"name": "1 Timothy", "abbr": "1Tim", "chapters": 6, "verses": [20,15,16,16,25,21]},
+                {"name": "2 Timothy", "abbr": "2Tim", "chapters": 4, "verses": [18,26,17,22]},
+                {"name": "Titus", "abbr": "Titus", "chapters": 3, "verses": [16,15,15]},
+                {"name": "Philemon", "abbr": "Phlm", "chapters": 1, "verses": [25]},
+                {"name": "Hebrews", "abbr": "Heb", "chapters": 13, "verses": [14,18,19,16,14,20,28,13,28,39,40,29,25]},
+                {"name": "James", "abbr": "Jas", "chapters": 5, "verses": [27,26,18,17,20]},
+                {"name": "1 Peter", "abbr": "1Pet", "chapters": 5, "verses": [25,25,22,19,14]},
+                {"name": "2 Peter", "abbr": "2Pet", "chapters": 3, "verses": [21,22,18]},
+                {"name": "1 John", "abbr": "1John", "chapters": 5, "verses": [10,29,24,21,21]},
+                {"name": "2 John", "abbr": "2John", "chapters": 1, "verses": [13]},
+                {"name": "3 John", "abbr": "3John", "chapters": 1, "verses": [14]},
+                {"name": "Jude", "abbr": "Jude", "chapters": 1, "verses": [25]},
+                {"name": "Revelation", "abbr": "Rev", "chapters": 22, "verses": [20,29,22,11,14,17,17,13,21,11,19,17,18,20,8,21,18,24,21,15,27,21]}
+            ]
+        }
     }
-  }
 };
 
 // ===== CONFIGURATION =====
-const API_URL = window.location.hostname === 'localhost' 
-    ? 'http://localhost:3000/api'  // Local development
-    : '/api';  // Production (same domain)
+const API_URL = window.location.hostname === 'localhost'
+    ? 'http://localhost:3000/api' // Local development
+    : '/api'; // Production (same domain)
+
+// --- Firebase Configuration ---
+// These variables are injected by the environment.
+const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
 
 // ===== DOM CACHE (for performance) =====
 const DOMElements = {};
 
 // ===== APPLICATION STATE =====
 const AppState = {
+    // Firebase State
+    app: null,
+    auth: null,
+    db: null,
+    userId: null,
+    notesCollectionRef: null,
+
+    // App State
     currentCategory: 'devotional',
     currentModule: 'spiritual-analysis',
     currentPassage: '',
-    currentNoteId: null,
-    notes: {}, // In-memory store
+    currentNoteId: null, // Tracks the currently open note
+    notes: {}, // In-memory store, populated by Firestore
     currentFontSize: 'font-size-normal', // Default font size
     // Bible Reader State
     currentReaderMode: false,
@@ -377,7 +414,10 @@ Include detailed morphological analysis, clause structures, and syntactic relati
 
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Cache all DOM elements
+    // 1. Initialize Firebase FIRST
+    initializeFirebaseAndAuth();
+
+    // 2. Cache all DOM elements
     DOMElements.sidebar = document.getElementById('sidebar');
     DOMElements.sidebarToggle = document.getElementById('sidebarToggle');
     DOMElements.sidebarArrow = document.getElementById('sidebarArrow');
@@ -409,21 +449,86 @@ document.addEventListener('DOMContentLoaded', () => {
     DOMElements.scrollLoaderBottom = document.getElementById('scrollLoaderBottom');
     DOMElements.analysisFooter = document.getElementById('analysisFooter');
     
-    // 2. Initialize Bible data
+    // Notes Panel Elements
+    DOMElements.noteEditor = document.getElementById('noteEditor');
+    DOMElements.notesList = document.getElementById('notesList');
+    DOMElements.newNoteBtn = document.getElementById('newNoteBtn');
+    DOMElements.saveNoteBtn = document.getElementById('saveNoteBtn');
+    DOMElements.deleteNoteBtn = document.getElementById('deleteNoteBtn');
+    DOMElements.noteCount = document.getElementById('noteCount');
+
+    // 3. Initialize Bible data
     try {
         processBibleData();
-        // 3. Set initial UI state
+        // 4. Set initial UI state
         updateModuleDisplay();
-        loadNotes();
-        // 4. Attach all event listeners
+        // loadNotes() is now called by Firebase auth
+        // 5. Attach all event listeners
         initializeAppListeners();
-        // 5. App is ready
+        // 6. App is ready
         setReadyState("Ready to Study God's Word", "Enter a scripture passage or general question, then choose an action.");
     } catch (error) {
         console.error("Failed to initialize app:", error);
         setErrorState("Failed to load Bible data. Please reload the app.");
     }
 });
+
+/**
+ * Initializes Firebase services and authentication.
+ */
+async function initializeFirebaseAndAuth() {
+    try {
+        console.log("Initializing Firebase...");
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        setLogLevel('Debug');
+
+        // Store in AppState
+        AppState.app = app;
+        AppState.auth = auth;
+        AppState.db = db;
+
+        // --- Authentication ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // User is signed in
+                AppState.userId = user.uid;
+                console.log("User authenticated with UID:", AppState.userId);
+                
+                // Define the Firestore collection path for this user
+                const collectionPath = `/artifacts/${appId}/users/${AppState.userId}/notes`;
+                AppState.notesCollectionRef = collection(AppState.db, collectionPath);
+                console.log("Firestore notes collection path set to:", collectionPath);
+
+                // User is authenticated, now we can safely set up the notes listener
+                loadNotesFromFirestore();
+
+            } else {
+                // User is signed out, or first-time visit
+                AppState.userId = null;
+                console.log("User is signed out. Attempting to sign in.");
+                // Try to sign in
+                try {
+                    if (initialAuthToken) {
+                        console.log("Attempting sign in with custom token...");
+                        await signInWithCustomToken(auth, initialAuthToken);
+                    } else {
+                        console.log("No custom token. Attempting sign in anonymously...");
+                        await signInAnonymously(auth);
+                    }
+                } catch (error) {
+                    console.error("Error during sign-in:", error);
+                    setErrorState(`Authentication Failed: ${error.message}`);
+                }
+            }
+        });
+
+    } catch (e) {
+        console.error("Error initializing Firebase:", e);
+        setErrorState("Failed to initialize Firebase. Please check console.");
+    }
+}
 
 /**
  * Processes the embedded BIBLE_DATA and populates the AppState maps.
@@ -483,11 +588,19 @@ function initializeAppListeners() {
     DOMElements.fontDecreaseBtn.addEventListener('click', () => handleFontSizeChange(-1));
     DOMElements.fontIncreaseBtn.addEventListener('click', () => handleFontSizeChange(1));
 
-    // Notes Panel Controls (stubbed for now)
+    // Notes Panel Controls (from index.html)
     document.getElementById('collapseBtn').addEventListener('click', () => resizeNotes('collapsed'));
     document.getElementById('normalBtn').addEventListener('click', () => resizeNotes('normal'));
     document.getElementById('mediumBtn').addEventListener('click', () => resizeNotes('medium'));
     document.getElementById('wideBtn').addEventListener('click', () => resizeNotes('wide'));
+
+    // --- Notes Functionality Listeners ---
+    DOMElements.newNoteBtn.addEventListener('click', createNewNote);
+    DOMElements.saveNoteBtn.addEventListener('click', saveCurrentNote);
+    DOMElements.deleteNoteBtn.addEventListener('click', deleteCurrentNote);
+
+    // Event delegation for clicking on a note in the list
+    DOMElements.notesList.addEventListener('click', handleNoteListClick);
 }
 
 // ===== API & CORE FUNCTIONS =====
@@ -1099,6 +1212,12 @@ function applyFontSize() {
     DOMElements.analysisContent.classList.remove(...sizes);
     DOMElements.analysisContent.classList.add(AppState.currentFontSize);
     
+    // Also apply to notes editor
+    if (DOMElements.noteEditor) {
+        DOMElements.noteEditor.classList.remove(...sizes);
+        DOMElements.noteEditor.classList.add(AppState.currentFontSize);
+    }
+
     // Disable buttons at min/max
     DOMElements.fontDecreaseBtn.disabled = (AppState.currentFontSize === sizes[0]);
     DOMElements.fontIncreaseBtn.disabled = (AppState.currentFontSize === sizes[sizes.length - 1]);
@@ -1192,8 +1311,8 @@ function switchModule(module, forceAutoRun = false) {
         if (isThisTab) {
             // Ensure this tab's parent group is active
             if (!tab.closest('.module-group').classList.contains('active')) {
-                 // This situation shouldn't happen if switchCategory is correct
-                 console.warn("Active tab is in an inactive group.");
+                // This situation shouldn't happen if switchCategory is correct
+                console.warn("Active tab is in an inactive group.");
             }
         }
     });
@@ -1225,23 +1344,193 @@ function getModuleInfo(category, module) {
     return { name: 'Error', prompt: 'Error: Module not found.', icon: '⚠️' };
 }
 
-// ===== NOTES (STUB - IMPLEMENT LINT) =====
-// TODO: Replace with Firestore
-function loadNotes() {
-    // This will be replaced with Firestore
-    const saved = localStorage.getItem('scribeNotes');
-    if (saved) {
-        AppState.notes = JSON.parse(saved);
+// ===== NOTES (FIRESTORE) =====
+
+/**
+ * Attaches a real-time listener to load and update notes from Firestore.
+ */
+function loadNotesFromFirestore() {
+    if (!AppState.notesCollectionRef) {
+        console.error("Notes collection reference is not set. Cannot load notes.");
+        return;
+    }
+
+    console.log("Setting up Firestore snapshot listener for notes...");
+    // We add orderBy here. This requires a composite index in Firestore,
+    // but it's the correct way to sort.
+    const q = query(AppState.notesCollectionRef, orderBy("updatedAt", "desc"));
+
+    onSnapshot(q, (snapshot) => {
+        console.log(`Received ${snapshot.docs.length} notes from Firestore.`);
+        AppState.notes = {}; // Clear the in-memory store
+        snapshot.docs.forEach((doc) => {
+            AppState.notes[doc.id] = doc.data();
+        });
+        
+        renderNotesList(); // Update the UI
         updateNoteCount();
+    }, (error) => {
+        console.error("Error listening to notes collection:", error);
+        DOMElements.notesList.innerHTML = `<li class="text-red-500 p-2">Error loading notes.</li>`;
+    });
+}
+
+/**
+ * Re-renders the list of notes in the notes panel.
+ */
+function renderNotesList() {
+    if (!DOMElements.notesList) return;
+    DOMElements.notesList.innerHTML = ''; // Clear the list
+
+    // AppState.notes is already an object, but onSnapshot query gives us sorted docs.
+    // Let's rely on the snapshot order if possible, or re-sort.
+    // The `onSnapshot` populates AppState.notes as a map, so we must re-sort.
+    
+    const sortedNotes = Object.entries(AppState.notes)
+        .sort(([, noteA], [, noteB]) => {
+            const timeA = noteA.updatedAt?.toMillis() || 0;
+            const timeB = noteB.updatedAt?.toMillis() || 0;
+            return timeB - timeA; // Descending
+        });
+
+    if (sortedNotes.length === 0) {
+        DOMElements.notesList.innerHTML = `<li class="p-2 text-gray-400 italic text-center">No notes yet.</li>`;
+        return;
+    }
+
+    sortedNotes.forEach(([id, note]) => {
+        const li = document.createElement('li');
+        li.className = `p-3 border-b border-gray-700 cursor-pointer hover:bg-gray-700 ${id === AppState.currentNoteId ? 'bg-blue-800' : ''}`;
+        li.dataset.id = id;
+
+        const title = note.passage || "Untitled Note";
+        const contentSnippet = note.content ? note.content.substring(0, 50) + '...' : 'No content';
+        
+        li.innerHTML = `
+            <div class="font-bold text-white truncate">${title}</div>
+            <div class="text-sm text-gray-300 truncate">${contentSnippet}</div>
+        `;
+        DOMElements.notesList.appendChild(li);
+    });
+}
+
+/**
+ * Handles clicks within the notes list to load a note.
+ */
+function handleNoteListClick(e) {
+    const li = e.target.closest('li[data-id]');
+    if (li) {
+        const noteId = li.dataset.id;
+        loadNoteIntoEditor(noteId);
     }
 }
 
-function saveNotes() {
-    // This will be replaced with Firestore
-    localStorage.setItem('scribeNotes', JSON.stringify(AppState.notes));
+/**
+ * Loads the content of a specific note into the editor.
+ * @param {string} noteId - The Firestore document ID of the note.
+ */
+function loadNoteIntoEditor(noteId) {
+    if (!AppState.notes[noteId]) {
+        console.error(`Note with ID ${noteId} not found in local state.`);
+        return;
+    }
+    
+    const note = AppState.notes[noteId];
+    AppState.currentNoteId = noteId;
+    DOMElements.noteEditor.value = note.content || '';
+    
+    // Highlight the selected note in the list
+    renderNotesList(); 
+    
+    // Enable the delete button
+    DOMElements.deleteNoteBtn.disabled = false;
 }
 
+/**
+ * Clears the note editor to create a new note.
+ */
+function createNewNote() {
+    AppState.currentNoteId = null;
+    DOMElements.noteEditor.value = '';
+    DOMElements.deleteNoteBtn.disabled = true; // Can't delete a new note
+    renderNotesList(); // To remove highlight
+}
+
+/**
+ * Saves the current note (either new or existing) to Firestore.
+ */
+async function saveCurrentNote() {
+    if (!AppState.notesCollectionRef) {
+        console.error("Cannot save note: Firestore is not ready.");
+        return;
+    }
+
+    DOMElements.saveNoteBtn.disabled = true;
+    DOMElements.saveNoteBtn.textContent = 'Saving...';
+
+    const content = DOMElements.noteEditor.value;
+    // Get context from the *analysis* display, not the input
+    const passage = DOMElements.analysisPassageDisplay.textContent || "Untitled Note";
+    const module = DOMElements.analysisModuleDisplay.textContent || "General";
+
+    const noteData = {
+        content: content,
+        passage: passage,
+        module: module,
+        updatedAt: serverTimestamp() // Use server-side timestamp
+    };
+
+    try {
+        if (AppState.currentNoteId) {
+            // Update existing note
+            console.log(`Updating note: ${AppState.currentNoteId}`);
+            const docRef = doc(AppState.notesCollectionRef, AppState.currentNoteId);
+            await setDoc(docRef, noteData, { merge: true }); // merge: true is safer
+        } else {
+            // Create new note
+            console.log("Adding new note...");
+            const docRef = await addDoc(AppState.notesCollectionRef, noteData);
+            AppState.currentNoteId = docRef.id; // Set new ID so next save is an update
+            console.log(`New note added with ID: ${docRef.id}`);
+        }
+        // The onSnapshot listener will handle the UI update
+    } catch (error) {
+        console.error("Error saving note:", error);
+    } finally {
+        DOMElements.saveNoteBtn.disabled = false;
+        DOMElements.saveNoteBtn.textContent = 'Save Note';
+        DOMElements.deleteNoteBtn.disabled = !AppState.currentNoteId; // Re-enable delete if it's a saved note
+        renderNotesList(); // To highlight the newly saved note
+    }
+}
+
+/**
+ * Deletes the currently loaded note from Firestore.
+ */
+async function deleteCurrentNote() {
+    if (!AppState.currentNoteId || !AppState.notesCollectionRef) {
+        console.warn("No note selected to delete.");
+        return;
+    }
+
+    // No custom confirm, just delete
+    console.log(`Deleting note: ${AppState.currentNoteId}`);
+    try {
+        DOMElements.deleteNoteBtn.disabled = true;
+        await deleteDoc(doc(AppState.notesCollectionRef, AppState.currentNoteId));
+        console.log("Note deleted.");
+        createNewNote(); // Clear the editor
+        // onSnapshot will update the list
+    } catch (error) {
+        console.error("Error deleting note:", error);
+        DOMElements.deleteNoteBtn.disabled = false; // Re-enable if delete failed
+    }
+}
+
+/**
+ * Updates the note count badge.
+ */
 function updateNoteCount() {
     const count = Object.keys(AppState.notes).length;
-    document.getElementById('noteCount').textContent = count;
+    DOMElements.noteCount.textContent = count;
 }
