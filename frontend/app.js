@@ -16,12 +16,14 @@ const AppState = {
     analysisVersions: {},
     currentVersionIndex: {},
     
-    // NEW: State for Bible Reader
+    // Bible Reader State
     currentBibleReference: { book: '', chapter: null, verse: null },
-    
-    // NEW: State for infinite scroll
     isFetchingChapter: false, // Prevents multiple fetches
-    currentReaderMode: false  // Is the Bible reader active?
+    currentReaderMode: false,  // Is the Bible reader active?
+    
+    // NEW: Bible Structure "Brain"
+    bibleStructure: null, // Will be loaded from bible-structure.json
+    bookNameMap: new Map() // For quick lookups (e.g., "Gen" -> "Genesis")
 };
 
 // ===== MODULE DEFINITIONS =====
@@ -331,6 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeApp();
     loadNotes();
     checkAPIHealth();
+    loadBibleStructure(); // <-- NEW: Load the "brain"
 });
 
 function initializeApp() {
@@ -387,7 +390,36 @@ function initializeApp() {
     setNotesPanelSize('normal');
 }
 
-// ===== API HEALTH CHECK =====
+// ===== API & DATA LOADING =====
+
+/**
+ * Loads the bible-structure.json file into the app state
+ */
+async function loadBibleStructure() {
+    try {
+        const response = await fetch('bible-structure.json');
+        if (!response.ok) {
+            throw new Error('Failed to load bible-structure.json');
+        }
+        const structure = await response.json();
+        AppState.bibleStructure = structure.books;
+        
+        // Create a map for easy lookup
+        AppState.bibleStructure.forEach((book, index) => {
+            AppState.bookNameMap.set(book.name.toLowerCase(), { ...book, index });
+            book.aliases.forEach(alias => {
+                AppState.bookNameMap.set(alias.toLowerCase(), { ...book, index });
+            });
+        });
+        console.log('Bible structure loaded successfully.');
+
+    } catch (error) {
+        console.error(error.message);
+        // App will still work, but "smart scroll" will be disabled
+        showError('Could not load Bible structure. Seamless scrolling will be limited.', true);
+    }
+}
+
 async function checkAPIHealth() {
     try {
         const response = await fetch(`${API_URL}/health`);
@@ -406,9 +438,6 @@ async function checkAPIHealth() {
 
 // ===== MAIN ANALYSIS / DATA FETCHING =====
 
-/**
- * Main entry point for module analysis
- */
 function generateModuleAnalysis() {
     const passage = passageInput.value.trim();
     if (!passage) {
@@ -419,18 +448,17 @@ function generateModuleAnalysis() {
     AppState.currentPassage = passage;
     AppState.currentReaderMode = false; // We are in module mode
 
-    // Get module info
     const moduleInfo = getModuleInfo(AppState.currentCategory, AppState.currentModule);
     
-    // Build prompt
     let prompt;
-    if (passage.includes(' ') || passage.includes(':') || passage.includes('-')) {
+    const ref = parsePassageReference(passage);
+    
+    if (ref) {
         // Looks like a passage
         prompt = moduleInfo.prompt.replace('{passage}', passage);
     } else {
         // Looks like a general question
-        prompt = `Treating "{passage}" as a general theological question, please provide a detailed answer. ${moduleInfo.prompt.substring(0, 100)}...`;
-        prompt = prompt.replace('{passage}', passage);
+        prompt = `Treating "${passage}" as a general theological question, please provide a detailed answer.`;
     }
     
     const analysisKey = `${passage}-${AppState.currentCategory}-${AppState.currentModule}`;
@@ -445,9 +473,6 @@ function generateModuleAnalysis() {
     });
 }
 
-/**
- * Main entry point for displaying scripture
- */
 function displayScripture() {
     const passage = passageInput.value.trim();
     if (!passage) {
@@ -464,40 +489,50 @@ function displayScripture() {
         return;
     }
     
-    AppState.currentBibleReference = ref;
+    AppState.currentBibleReference = ref; // Store the *standardized* reference
     
     const version = versionSelect.value;
-    const prompt = `Provide the full text for the *entire chapter* of ${ref.book} ${ref.chapter}, using the ${version} version. Format it with [VerseNumber] tags.`;
+    const prompt = getScripturePrompt(ref.book, ref.chapter, version);
     const analysisKey = `${ref.book} ${ref.chapter}-${version}`;
     
     runAnalysis({
         type: 'scripture',
         prompt: prompt,
         analysisKey: analysisKey,
-        passage: passage,
-        version: version
+        passage: passage, // Keep original user passage for display
+        version: version,
+        ref: ref
     });
 }
 
 /**
+ * Generates the correct prompt for fetching scripture
+ */
+function getScripturePrompt(book, chapter, version) {
+    let versionPrompt = `using the ${version} version`;
+    if (version === 'WLC') {
+        versionPrompt = "using the Hebrew Westminster Leningrad Codex (WLC). Include Hebrew text.";
+    } else if (version === 'SBLGNT') {
+        versionPrompt = "using the SBL Greek New Testament (SBLGNT). Include Greek text.";
+    }
+    
+    return `Provide the full text for the *entire chapter* of ${book} ${chapter}, ${versionPrompt}. Format each verse as [VerseNumber] The text of the verse.`;
+}
+
+/**
  * The core function to call the backend API and handle responses
- * @param {object} options - Configuration for the analysis
  */
 async function runAnalysis(options) {
     // --- 1. Set Loading State ---
     if (AppState.isFetchingChapter) return; // Prevent loop
     
-    // Detach scroll listener if it exists (to prevent infinite loop)
     analysisDisplay.removeEventListener('scroll', scrollHandler);
 
-    // Set fetching flag if we are scrolling
     if (options.type === 'scroll-top' || options.type === 'scroll-bottom') {
         AppState.isFetchingChapter = true;
         showScrollLoader(options.type === 'scroll-top' ? 'top' : 'bottom');
     } else {
-        // This is a new, fresh analysis
         setLoadingState(true);
-        // Clear previous version history for this new request
         AppState.analysisVersions[options.analysisKey] = [];
         AppState.currentVersionIndex[options.analysisKey] = 0;
     }
@@ -523,32 +558,27 @@ async function runAnalysis(options) {
         const analysis = data.analysis;
         
         // --- 3. Store and Display Results ---
-        
-        // Store this new analysis as the first version
         if (options.type !== 'scroll-top' && options.type !== 'scroll-bottom') {
             AppState.analysisVersions[options.analysisKey] = [analysis];
             AppState.currentVersionIndex[options.analysisKey] = 0;
         }
 
-        // Display the content
         displayAnalysis(analysis, options);
 
     } catch (error) {
         console.error('Analysis Error:', error);
         showError(error.message);
         
-        // Ensure fetching state is reset on error
         if (options.type === 'scroll-top' || options.type === 'scroll-bottom') {
             AppState.isFetchingChapter = false;
         }
     } finally {
         // --- 4. Reset Loading State ---
         if (options.type === 'scroll-top' || options.type === 'scroll-bottom') {
-            // Re-attach scroll listener after a short delay to allow DOM to settle
             setTimeout(() => {
                 analysisDisplay.addEventListener('scroll', scrollHandler);
                 AppState.isFetchingChapter = false;
-            }, 100);
+            }, 100); // Short delay for DOM to settle
             hideScrollLoader(options.type === 'scroll-top' ? 'top' : 'bottom');
         } else {
             setLoadingState(false);
@@ -562,54 +592,51 @@ async function runAnalysis(options) {
  * Handles the "infinite scroll" behavior for the Bible Reader
  */
 function scrollHandler() {
-    if (AppState.isFetchingChapter || !AppState.currentReaderMode) {
-        return;
+    if (AppState.isFetchingChapter || !AppState.currentReaderMode || !AppState.bibleStructure) {
+        return; // Do nothing if fetching, not in reader mode, or brain not loaded
     }
 
     const { scrollTop, scrollHeight, clientHeight } = analysisDisplay;
+    const currentRef = AppState.currentBibleReference;
+    const version = versionSelect.value;
 
-    // Check if scrolled to the top
+    // --- Check if scrolled to the top ---
     if (scrollTop < 50) { // 50px buffer
-        const { book, chapter } = AppState.currentBibleReference;
-        if (chapter > 1) {
-            const prevChapter = chapter - 1;
-            AppState.currentBibleReference.chapter = prevChapter; // Update state
-            
-            const version = versionSelect.value;
-            const prompt = `Provide the full text for ${book} ${prevChapter}, using the ${version} version. Format it with [VerseNumber] tags.`;
+        const newRef = getPreviousChapter(currentRef);
+        
+        if (newRef) {
+            AppState.currentBibleReference = newRef; // Update state
+            const prompt = getScripturePrompt(newRef.book, newRef.chapter, version);
             
             runAnalysis({
                 type: 'scroll-top',
                 prompt: prompt,
-                passage: `${book} ${prevChapter}`,
-                version: version
+                passage: `${newRef.book} ${newRef.chapter}`,
+                version: version,
+                ref: newRef
             });
         }
     }
     
-    // Check if scrolled to the bottom
+    // --- Check if scrolled to the bottom ---
     if (scrollHeight - scrollTop - clientHeight < 50) { // 50px buffer
-        const { book, chapter } = AppState.currentBibleReference;
-        // We'd need to know max chapters per book for this. For now, just assume it's possible.
-        const nextChapter = chapter + 1;
-        AppState.currentBibleReference.chapter = nextChapter; // Update state
+        const newRef = getNextChapter(currentRef);
 
-        const version = versionSelect.value;
-        const prompt = `Provide the full text for ${book} ${nextChapter}, using the ${version} version. Format it with [VerseNumber] tags.`;
-        
-        runAnalysis({
-            type: 'scroll-bottom',
-            prompt: prompt,
-            passage: `${book} ${nextChapter}`,
-            version: version
-        });
+        if (newRef) {
+            AppState.currentBibleReference = newRef; // Update state
+            const prompt = getScripturePrompt(newRef.book, newRef.chapter, version);
+            
+            runAnalysis({
+                type: 'scroll-bottom',
+                prompt: prompt,
+                passage: `${newRef.book} ${newRef.chapter}`,
+                version: version,
+                ref: newRef
+            });
+        }
     }
 }
 
-/**
- * Shows or hides the main loading state
- * @param {boolean} isLoading
- */
 function setLoadingState(isLoading) {
     if (isLoading) {
         statusMessage.classList.remove('hidden');
@@ -628,42 +655,46 @@ function setLoadingState(isLoading) {
         analysisDisplay.classList.add('visible');
     }
     
-    // Disable action buttons while loading
     runModuleBtn.disabled = isLoading;
     displayScriptureBtn.disabled = isLoading;
 }
 
-/**
- * Renders the analysis or scripture text to the display pane
- * @param {string} content - The formatted text to display
- * @param {object} options - The original options object
- */
 function displayAnalysis(content, options) {
-    // --- 1. Format the Content ---
     let formatted = formatMarkdown(content);
     
-    // --- 2. Handle Scroll-Stitching ---
+    // --- Handle Scroll-Stitching ---
     if (options.type === 'scroll-top') {
         const oldScrollHeight = analysisDisplay.scrollHeight;
         const oldScrollTop = analysisDisplay.scrollTop;
         
-        analysisDisplay.innerHTML = formatted + analysisDisplay.innerHTML;
+        // Add a small divider
+        const divider = `<hr class="chapter-divider" data-book="${options.ref.book}" data-chapter="${options.ref.chapter}">`;
+        analysisDisplay.innerHTML = divider + formatted + analysisDisplay.innerHTML;
         
         // Maintain scroll position
         analysisDisplay.scrollTop = oldScrollTop + (analysisDisplay.scrollHeight - oldScrollHeight);
         
+        // Update the sticky header to the top-most chapter
+        const readerTitle = document.getElementById('readerChapterDisplay');
+        if (readerTitle) {
+            readerTitle.textContent = `${options.ref.book} ${options.ref.chapter}`;
+        }
+        
     } else if (options.type === 'scroll-bottom') {
-        analysisDisplay.innerHTML += formatted;
+        // Add a small divider
+        const divider = `<hr class="chapter-divider" data-book="${options.ref.book}" data-chapter="${options.ref.chapter}">`;
+        analysisDisplay.innerHTML += divider + formatted;
         
     } else {
         // This is a new, fresh load
         analysisDisplay.innerHTML = '';
         
-        // --- 3. Build Header ---
+        // --- Build Header ---
         const header = document.createElement('div');
         header.className = 'analysis-header';
         
         if (options.type === 'module') {
+            AppState.currentReaderMode = false;
             const template = document.getElementById('analysisHeaderTemplate');
             header.innerHTML = template.innerHTML;
             header.querySelector('#analysisPassageDisplay').textContent = options.passage;
@@ -671,13 +702,13 @@ function displayAnalysis(content, options) {
             header.querySelector('#analysisIconDisplay').textContent = options.icon || '🔬';
             header.querySelector('#regenerateBtn').onclick = generateModuleAnalysis; // Re-hook
             
-            // Detach scroll listener if it's a module
             analysisDisplay.removeEventListener('scroll', scrollHandler);
 
         } else if (options.type === 'scripture') {
+            AppState.currentReaderMode = true;
             const template = document.getElementById('readerHeaderTemplate');
             header.innerHTML = template.innerHTML;
-            header.querySelector('#readerChapterDisplay').textContent = `${AppState.currentBibleReference.book} ${AppState.currentBibleReference.chapter}`;
+            header.querySelector('#readerChapterDisplay').textContent = `${options.ref.book} ${options.ref.chapter}`;
             
             // Attach scroll listener
             analysisDisplay.addEventListener('scroll', scrollHandler);
@@ -685,32 +716,25 @@ function displayAnalysis(content, options) {
         
         analysisDisplay.appendChild(header);
         
-        // --- 4. Build Content Body ---
+        // --- Build Content Body ---
         const contentDiv = document.createElement('div');
         contentDiv.className = 'analysis-content';
         contentDiv.innerHTML = formatted;
         analysisDisplay.appendChild(contentDiv);
         
-        // --- 5. Build Footer (for modules only) ---
+        // --- Build Footer (for modules only) ---
         if (options.type === 'module') {
             const footer = document.createElement('div');
             footer.className = 'analysis-footer';
             const template = document.getElementById('versionControlsTemplate');
             footer.innerHTML = template.innerHTML;
             analysisDisplay.appendChild(footer);
-            // updateVersionControls(); // This will be needed later
         }
 
-        // --- 6. Scroll to Top (or to verse) ---
-        if (options.type === 'scripture' && AppState.currentBibleReference.verse) {
-            // Logic to scroll to a specific verse (to be implemented)
-            analysisDisplay.scrollTop = 0; // For now, just scroll to top
-        } else {
-            analysisDisplay.scrollTop = 0;
-        }
+        // --- Scroll to Top (or to verse) ---
+        analysisDisplay.scrollTop = 0;
     }
 
-    // Make sure display is visible
     statusMessage.classList.add('hidden');
     analysisDisplay.classList.add('visible');
 }
@@ -718,26 +742,21 @@ function displayAnalysis(content, options) {
 /**
  * Shows an error message in the main display
  * @param {string} message
+ * @param {boolean} [isWarning=false] - If true, shows a yellow warning instead of red error
  */
-function showError(message) {
+function showError(message, isWarning = false) {
     statusMessage.innerHTML = `
-        <div class="status-icon">⚠️</div>
-        <div class="status-title">Error</div>
-        <p class="status-text" style="color: #d32f2f;">${message}</p>
+        <div class="status-icon">${isWarning ? '⚠️' : '🚫'}</div>
+        <div class="status-title">${isWarning ? 'Warning' : 'Error'}</div>
+        <p class="status-text" style="color: ${isWarning ? '#a1830a' : '#d32f2f'};">${message}</p>
     `;
     statusMessage.classList.remove('hidden');
     analysisDisplay.classList.remove('visible');
     
-    // Re-enable buttons
     runModuleBtn.disabled = false;
     displayScriptureBtn.disabled = false;
 }
 
-/**
- * Formats plain text/markdown into HTML
- * @param {string} text
- * @returns {string} HTML
- */
 function formatMarkdown(text) {
     if (!text) return '';
 
@@ -767,10 +786,6 @@ function formatMarkdown(text) {
 }
 
 
-/**
- * Shows/hides the top/bottom scroll loaders
- * @param {'top' | 'bottom'} position
- */
 function showScrollLoader(position) {
     let loader = analysisDisplay.querySelector(`.scroll-loader-${position}`);
     if (!loader) {
@@ -800,7 +815,6 @@ function hideScrollLoader(position) {
 function switchCategory(category) {
     AppState.currentCategory = category;
     
-    // Update UI
     document.querySelectorAll('.primary-tab').forEach(tab => {
         tab.classList.toggle('active', tab.dataset.category === category);
     });
@@ -809,12 +823,10 @@ function switchCategory(category) {
         group.classList.toggle('active', group.dataset.category === category);
     });
 
-    // Set first module as active
     const firstModule = ModuleDefinitions[category].modules;
     const firstModuleKey = Object.keys(firstModule)[0];
     switchModule(firstModuleKey);
 
-    // Update header
     sidebarHeader.textContent = ModuleDefinitions[category].name;
 }
 
@@ -858,37 +870,100 @@ function setNotesPanelSize(size) {
         notesPanel.classList.add('wide');
         document.getElementById('wideBtn').classList.add('active');
     } else {
-        // Default to 'normal'
         document.getElementById('normalBtn').classList.add('active');
     }
     
     notesArrow.textContent = size === 'collapsed' ? '◀' : '▶';
 }
 
-// ===== UTILITIES =====
+// ===== BIBLE STRUCTURE UTILITIES =====
 
 /**
- * Parses a passage string into a reference object
+ * Gets the standardized book data from any alias
+ * @param {string} bookName
+ * @returns {object | null} Book data
+ */
+function getBookData(bookName) {
+    if (!bookName || !AppState.bookNameMap) return null;
+    return AppState.bookNameMap.get(bookName.toLowerCase().trim());
+}
+
+/**
+ * Parses a passage string into a standardized reference object
  * @param {string} passageStr
  * @returns {object | null}
  */
 function parsePassageReference(passageStr) {
     if (!passageStr) return null;
     
-    // Simple parser: "Book Chapter:Verse" or "Book Chapter"
     // Regex to capture book, chapter, and optional verse
+    // Handles "1 John", "John", "1John"
     const regex = /^([1-3]?\s?[A-Za-z]+)\s*(\d+)(?:[:\.](\d+))?.*$/;
     const match = passageStr.match(regex);
     
     if (match) {
+        const bookData = getBookData(match[1]);
+        if (!bookData) {
+            // Can't find this book in our structure
+            return null;
+        }
+        
         return {
-            book: match[1].trim(),
+            book: bookData.name, // Use the *standardized* name
             chapter: parseInt(match[2], 10),
             verse: match[3] ? parseInt(match[3], 10) : null
         };
     }
     
     return null; // Invalid format
+}
+
+/**
+ * Gets the reference for the next chapter
+ * @param {object} ref - { book, chapter, verse }
+ * @returns {object | null}
+ */
+function getNextChapter(ref) {
+    if (!AppState.bibleStructure) return null;
+    
+    const bookData = getBookData(ref.book);
+    if (!bookData) return null;
+
+    if (ref.chapter < bookData.chapters) {
+        // Next chapter in the same book
+        return { ...ref, chapter: ref.chapter + 1 };
+    } else {
+        // Go to next book
+        const nextBookData = AppState.bibleStructure[bookData.index + 1];
+        if (nextBookData) {
+            return { book: nextBookData.name, chapter: 1, verse: null };
+        }
+    }
+    return null; // End of Bible
+}
+
+/**
+ * Gets the reference for the previous chapter
+ * @param {object} ref - { book, chapter, verse }
+ * @returns {object | null}
+ */
+function getPreviousChapter(ref) {
+    if (!AppState.bibleStructure) return null;
+    
+    const bookData = getBookData(ref.book);
+    if (!bookData) return null;
+
+    if (ref.chapter > 1) {
+        // Previous chapter in the same book
+        return { ...ref, chapter: ref.chapter - 1 };
+    } else {
+        // Go to previous book
+        const prevBookData = AppState.bibleStructure[bookData.index - 1];
+        if (prevBookData) {
+            return { book: prevBookData.name, chapter: prevBookData.chapters, verse: null };
+        }
+    }
+    return null; // Start of Bible
 }
 
 // ===== NOTES (localStorage) =====
@@ -898,7 +973,6 @@ function updateNoteState() {
     const content = notesEditor.value;
     const title = noteNameInput.value;
     
-    // Update UI
     const words = content.trim().split(/\s+/).filter(Boolean).length;
     wordCount.textContent = `${words} words`;
     
@@ -908,7 +982,6 @@ function updateNoteState() {
         noteMeta.textContent = `New note • ${words} words`;
     }
 
-    // Debounce save
     if (saveTimeout) clearTimeout(saveTimeout);
     saveStatus.textContent = 'Saving...';
     
@@ -923,7 +996,6 @@ function saveCurrentNote() {
     const content = notesEditor.value;
     
     if (!AppState.currentNoteId) {
-        // This is a new note, create an ID
         if (!content && title === 'Untitled Note') return; // Don't save empty new notes
         AppState.currentNoteId = `note_${new Date().getTime()}`;
     }
@@ -936,7 +1008,7 @@ function saveCurrentNote() {
     };
     
     saveNotesToStorage();
-    updateNoteList(); // Update count
+    updateNoteList();
 }
 
 function loadNotes() {
@@ -988,7 +1060,6 @@ function deleteCurrentNote() {
 function updateNoteList() {
     const count = Object.keys(AppState.notes).length;
     noteCount.textContent = count;
-    // We'll build the "My Notes" modal later
 }
 
 function showNotesList() {
