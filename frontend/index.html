@@ -482,6 +482,10 @@
         }
 
         /* -- Content -- */
+        .analysis-content-wrapper {
+             /* This new wrapper holds the content and loaders */
+        }
+
         .analysis-content {
             padding: 28px 48px 60px;
             line-height: 1.8;
@@ -1127,7 +1131,8 @@
                     </div>
                     
                     <!-- Scrollable Content -->
-                    <div class->
+                    <!-- FIX: This div was missing its class. -->
+                    <div class="analysis-content-wrapper">
                         <div class="scroll-loader" id="scrollLoaderTop">
                             <div class="loading-dots">
                                 <span>.</span><span>.</span><span>.</span>
