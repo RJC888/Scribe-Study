@@ -746,6 +746,13 @@
             color: var(--text-dark);
             flex-grow: 1; /* Allows content to fill space */
         }
+        
+        /* New divider for chapters */
+        .chapter-divider {
+            border: none;
+            border-top: 1px solid var(--sand);
+            margin: 24px 0;
+        }
 
         .analysis-content h1, .analysis-content h2, .analysis-content h3 {
             color: var(--evergreen);
@@ -803,26 +810,6 @@
             align-items: center;
             gap: 16px;
             width: 100%;
-        }
-
-        .reader-nav-btn {
-            padding: 8px 16px;
-            background: white;
-            border: 2px solid var(--sand);
-            color: var(--text-dark);
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        .reader-nav-btn:hover:not(:disabled) {
-            background: var(--parchment);
-            border-color: var(--evergreen);
-        }
-        .reader-nav-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
         }
         
         .reader-chapter-title {
@@ -1012,6 +999,7 @@
                         <span style="font-size: 18px;">📖</span>
                         Display Scripture Text
                     </button>
+                    <!-- UPDATED DROPDOWN -->
                     <select class="version-select" id="versionSelect">
                         <option value="KJV">KJV (English)</option>
                         <option value="BBE">BBE (Basic English)</option>
