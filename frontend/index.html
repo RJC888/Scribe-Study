@@ -270,7 +270,7 @@
             cursor: not-allowed;
         }
         
-        /* NEW: Action Bar */
+        /* Action Bar */
         .action-bar {
             display: flex;
             gap: 12px;
@@ -338,7 +338,7 @@
             flex: 1;
             position: relative; /* For scroll loaders */
             padding: 32px;
-            overflow-y: scroll; /* <-- FIX: Force scrollbar to be visible */
+            overflow-y: scroll; /* Force scrollbar */
             min-height: 0; /* Important for flexbox scrolling */
         }
         
@@ -359,7 +359,6 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             border: 1px solid var(--sand);
             min-height: 500px;
-            /* overflow: hidden; Removed to allow sticky header */
         }
 
         .status-icon {
@@ -396,10 +395,16 @@
         .analysis-title-display {
             display: flex;
             align-items: center;
+            justify-content: space-between; /* To push font controls */
             gap: 12px;
             font-size: 13px;
             font-weight: 600;
             color: var(--text-medium);
+        }
+        .analysis-title-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
         .analysis-icon {
             font-size: 24px;
@@ -422,40 +427,57 @@
             justify-content: space-between;
             align-items: center;
         }
-        .reader-btn {
-            background: var(--parchment);
-            border: 2px solid var(--sand);
-            color: var(--text-dark);
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .reader-btn:hover:not(:disabled) {
-            background: var(--sand);
-            border-color: var(--evergreen);
-        }
-        .reader-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
+        
         .reader-title {
             font-size: 20px;
             font-weight: 700;
             color: var(--text-dark);
+        }
+        
+        /* NEW: Font Size Controls */
+        .font-controls {
+            display: flex;
+            gap: 6px;
+        }
+        .font-btn {
+            width: 32px;
+            height: 32px;
+            background: var(--parchment);
+            border: 2px solid var(--sand);
+            color: var(--text-dark);
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .font-btn:hover {
+            background: var(--sand);
+            border-color: var(--evergreen);
+        }
+        .font-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
         }
 
 
         /* ===== ANALYSIS CONTENT ===== */
         .analysis-content {
             padding: 28px;
-            line-height: 1.8;
             color: var(--text-dark);
             font-family: 'Georgia', serif; /* Serif font for reading */
+            transition: font-size 0.2s ease;
         }
         
+        /* NEW: Font size classes */
+        .font-size-small { font-size: 14px; line-height: 1.7; }
+        .font-size-normal { font-size: 16px; line-height: 1.8; }
+        .font-size-large { font-size: 18px; line-height: 1.9; }
+        .font-size-xlarge { font-size: 20px; line-height: 2.0; }
+
         /* NEW: Scroll Loaders */
         .scroll-loader {
             display: none; /* Hidden by default */
@@ -472,38 +494,40 @@
             margin-top: -1px; /* Resets layout */
         }
 
+        /* FIX: Make headers match the reading font */
         .analysis-content h1, .analysis-content h2, .analysis-content h3 {
             color: var(--evergreen);
             margin-top: 24px;
             margin-bottom: 12px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; /* Sans-serif for headers */
+            font-family: 'Georgia', serif; /* <-- FIX */
+            font-weight: 700; /* Keep them bold */
         }
 
         .analysis-content h1 {
-            font-size: 24px;
+            font-size: 1.5em; /* Relative to parent font size */
             border-bottom: 2px solid var(--sand);
             padding-bottom: 8px;
         }
 
         .analysis-content h2 {
-            font-size: 20px;
+            font-size: 1.25em; /* Relative to parent font size */
         }
 
         .analysis-content h3 {
-            font-size: 16px;
+            font-size: 1.1em; /* Relative to parent font size */
         }
 
         .analysis-content p {
-            margin-bottom: 16px;
+            margin-bottom: 1em;
         }
 
         .analysis-content ul, .analysis-content ol {
             margin-left: 24px;
-            margin-bottom: 16px;
+            margin-bottom: 1em;
         }
 
         .analysis-content li {
-            margin-bottom: 8px;
+            margin-bottom: 0.5em;
         }
 
         .analysis-content strong {
@@ -517,7 +541,7 @@
             border-left: 3px solid var(--evergreen);
             color: var(--text-medium);
             font-style: italic;
-            margin-bottom: 16px;
+            margin-bottom: 1em;
         }
         
         .analysis-footer {
@@ -1062,17 +1086,26 @@
                         
                         <!-- Header for Module Analysis -->
                         <div class="analysis-title-display" id="analysisTitleDisplay">
-                            <span class="analysis-icon" id="analysisIconDisplay">📖</span>
-                            <div>
-                                <div class="analysis-passage-display" id="analysisPassageDisplay">Romans 8:1-2</div>
-                                <div class="analysis-module-display" id="analysisModuleDisplay">Spiritual Analysis</div>
+                            <div class="analysis-title-left">
+                                <span class="analysis-icon" id="analysisIconDisplay">📖</span>
+                                <div>
+                                    <div class="analysis-passage-display" id="analysisPassageDisplay">Romans 8:1-2</div>
+                                    <div class="analysis-module-display" id="analysisModuleDisplay">Spiritual Analysis</div>
+                                </div>
+                            </div>
+                            <div class="font-controls">
+                                <button class="font-btn" id="fontDecreaseBtn" data-tooltip="Decrease font size">A-</button>
+                                <button class="font-btn" id="fontIncreaseBtn" data-tooltip="Increase font size">A+</button>
                             </div>
                         </div>
 
                         <!-- Header for Bible Reader -->
                         <div class="reader-controls-display" id="readerControlsDisplay">
                             <div class="reader-title" id="readerTitleDisplay">Romans 8</div>
-                            <!-- Prev/Next buttons are now gone -->
+                            <div class="font-controls">
+                                <button class="font-btn" id="readerFontDecreaseBtn" data-tooltip="Decrease font size">A-</button>
+                                <button class="font-btn" id="readerFontIncreaseBtn" data-tooltip="Increase font size">A+</button>
+                            </div>
                         </div>
 
                     </div>
@@ -1085,7 +1118,7 @@
                     </div>
 
                     <!-- Main Content (Analysis or Scripture) -->
-                    <div classs="analysis-content" id="analysisContent">
+                    <div class="analysis-content font-size-normal" id="analysisContent">
                         <!-- Content injected by JS -->
                     </div>
 
@@ -1144,7 +1177,7 @@
                     <div class="notes-toolbar">
                         <button class="notes-tool-btn" id="exportBtn">📥 Export</button>
                         <button class="notes-tool-btn" id="copyBtn">📋 Copy</button>
-                        <button classs="notes-tool-btn" id="deleteBtn">🗑 Delete</button>
+                        <button class="notes-tool-btn" id="deleteBtn">🗑 Delete</button>
                     </div>
                 </div>
 
