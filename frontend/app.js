@@ -414,62 +414,73 @@ Include detailed morphological analysis, clause structures, and syntactic relati
 
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Initialize Firebase FIRST
-    initializeFirebaseAndAuth();
-
-    // 2. Cache all DOM elements
-    DOMElements.sidebar = document.getElementById('sidebar');
-    DOMElements.sidebarToggle = document.getElementById('sidebarToggle');
-    DOMElements.sidebarArrow = document.getElementById('sidebarArrow');
-    DOMElements.sidebarHeader = document.getElementById('sidebarHeader');
-    DOMElements.notesPanel = document.getElementById('notesPanel');
-    DOMElements.notesToggle = document.getElementById('notesToggle');
-    DOMElements.notesArrow = document.getElementById('notesArrow');
-    DOMElements.passageInput = document.getElementById('passageInput');
-    DOMElements.runModuleBtn = document.getElementById('runModuleBtn');
-    DOMElements.displayScriptureBtn = document.getElementById('displayScriptureBtn');
-    DOMElements.versionSelect = document.getElementById('versionSelect');
-    DOMElements.resultsMain = document.getElementById('resultsMain');
-    DOMElements.statusMessage = document.getElementById('statusMessage');
-    DOMElements.statusIcon = document.getElementById('statusIcon');
-    DOMElements.statusTitle = document.getElementById('statusTitle');
-    DOMElements.statusText = document.getElementById('statusText');
-    DOMElements.analysisDisplay = document.getElementById('analysisDisplay');
-    DOMElements.analysisHeader = document.querySelector('.analysis-header');
-    DOMElements.analysisTitleDisplay = document.getElementById('analysisTitleDisplay');
-    DOMElements.analysisIconDisplay = document.getElementById('analysisIconDisplay');
-    DOMElements.analysisPassageDisplay = document.getElementById('analysisPassageDisplay');
-    DOMElements.analysisModuleDisplay = document.getElementById('analysisModuleDisplay');
-    DOMElements.readerControlsDisplay = document.getElementById('readerControlsDisplay');
-    DOMElements.readerTitleDisplay = document.getElementById('readerTitleDisplay');
-    DOMElements.fontDecreaseBtn = document.getElementById('fontDecreaseBtn');
-    DOMElements.fontIncreaseBtn = document.getElementById('fontIncreaseBtn');
-    DOMElements.analysisContent = document.getElementById('analysisContent');
-    DOMElements.scrollLoaderTop = document.getElementById('scrollLoaderTop');
-    DOMElements.scrollLoaderBottom = document.getElementById('scrollLoaderBottom');
-    DOMElements.analysisFooter = document.getElementById('analysisFooter');
-    
-    // Notes Panel Elements
-    DOMElements.noteEditor = document.getElementById('noteEditor');
-    DOMElements.notesList = document.getElementById('notesList');
-    DOMElements.newNoteBtn = document.getElementById('newNoteBtn');
-    DOMElements.saveNoteBtn = document.getElementById('saveNoteBtn');
-    DOMElements.deleteNoteBtn = document.getElementById('deleteNoteBtn');
-    DOMElements.noteCount = document.getElementById('noteCount');
-
-    // 3. Initialize Bible data
+    // --- THIS IS THE FIX ---
+    // We wrap EVERYTHING in the try...catch block.
+    // This ensures that if caching DOM elements fails OR
+    // processBibleData fails, the catch block will
+    // be triggered correctly.
     try {
+        // 1. Cache all DOM elements FIRST
+        DOMElements.sidebar = document.getElementById('sidebar');
+        DOMElements.sidebarToggle = document.getElementById('sidebarToggle');
+        DOMElements.sidebarArrow = document.getElementById('sidebarArrow');
+        DOMElements.sidebarHeader = document.getElementById('sidebarHeader');
+        DOMElements.notesPanel = document.getElementById('notesPanel');
+        DOMElements.notesToggle = document.getElementById('notesToggle');
+        DOMElements.notesArrow = document.getElementById('notesArrow');
+        DOMElements.passageInput = document.getElementById('passageInput');
+        DOMElements.runModuleBtn = document.getElementById('runModuleBtn');
+        DOMElements.displayScriptureBtn = document.getElementById('displayScriptureBtn');
+        DOMElements.versionSelect = document.getElementById('versionSelect');
+        DOMElements.resultsMain = document.getElementById('resultsMain');
+        DOMElements.statusMessage = document.getElementById('statusMessage');
+        DOMElements.statusIcon = document.getElementById('statusIcon');
+        DOMElements.statusTitle = document.getElementById('statusTitle');
+        DOMElements.statusText = document.getElementById('statusText');
+        DOMElements.analysisDisplay = document.getElementById('analysisDisplay');
+        DOMElements.analysisHeader = document.querySelector('.analysis-header');
+        DOMElements.analysisTitleDisplay = document.getElementById('analysisTitleDisplay');
+        DOMElements.analysisIconDisplay = document.getElementById('analysisIconDisplay');
+        DOMElements.analysisPassageDisplay = document.getElementById('analysisPassageDisplay');
+        DOMElements.analysisModuleDisplay = document.getElementById('analysisModuleDisplay');
+        DOMElements.readerControlsDisplay = document.getElementById('readerControlsDisplay');
+        DOMElements.readerTitleDisplay = document.getElementById('readerTitleDisplay');
+        DOMElements.fontDecreaseBtn = document.getElementById('fontDecreaseBtn');
+        DOMElements.fontIncreaseBtn = document.getElementById('fontIncreaseBtn');
+        DOMElements.analysisContent = document.getElementById('analysisContent');
+        DOMElements.scrollLoaderTop = document.getElementById('scrollLoaderTop');
+        DOMElements.scrollLoaderBottom = document.getElementById('scrollLoaderBottom');
+        DOMElements.analysisFooter = document.getElementById('analysisFooter');
+        
+        // Notes Panel Elements
+        DOMElements.noteEditor = document.getElementById('noteEditor');
+        DOMElements.notesList = document.getElementById('notesList');
+        DOMElements.newNoteBtn = document.getElementById('newNoteBtn');
+        DOMElements.saveNoteBtn = document.getElementById('saveNoteBtn');
+        DOMElements.deleteNoteBtn = document.getElementById('deleteNoteBtn');
+        DOMElements.noteCount = document.getElementById('noteCount');
+
+        // 2. Initialize Firebase
+        // This function can now safely call setErrorState if it fails
+        initializeFirebaseAndAuth();
+
+        // 3. Initialize Bible data
         processBibleData();
+
         // 4. Set initial UI state
         updateModuleDisplay();
         // loadNotes() is now called by Firebase auth
+
         // 5. Attach all event listeners
         initializeAppListeners();
+
         // 6. App is ready
         setReadyState("Ready to Study God's Word", "Enter a scripture passage or general question, then choose an action.");
+
     } catch (error) {
         console.error("Failed to initialize app:", error);
-        setErrorState("Failed to load Bible data. Please reload the app.");
+        // This will now work because DOMElements are cached.
+        setErrorState("Failed to load app. Check console for errors.");
     }
 });
 
