@@ -39,3 +39,8 @@
   color: var(--charcoal, #2d3234);
   font-weight: 600;
 }
+
+/* Extra spacing for breathing room */
+#mindmap {
+  margin-top: 24px;
+}
