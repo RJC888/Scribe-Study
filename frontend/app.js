@@ -1,5 +1,5 @@
 // ===== FIREBASE IMPORTS =====
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import {
     getAuth,
     signInAnonymously,
