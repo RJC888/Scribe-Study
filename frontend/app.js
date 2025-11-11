@@ -635,14 +635,21 @@ function initializeAppListeners() {
     document.getElementById('wideBtn')?.addEventListener('click', () => resizeNotes('wide'));
 
     // --- Notes Functionality Listeners ---
-    DOMElements.newNoteBtn.addEventListener('click', createNewNote);
-    if (DOMElements.saveNoteBtn) {
+   if (DOMElements.newNoteBtn) {
+  DOMElements.newNoteBtn.addEventListener('click', createNewNote);
+}
+
+if (DOMElements.saveNoteBtn) {
   DOMElements.saveNoteBtn.addEventListener('click', saveCurrentNote);
 }
-    DOMElements.deleteNoteBtn.addEventListener('click', deleteCurrentNote);
 
-    // Event delegation for clicking on a note in the list
-    DOMElements.notesList.addEventListener('click', handleNoteListClick);
+if (DOMElements.deleteNoteBtn) {
+  DOMElements.deleteNoteBtn.addEventListener('click', deleteCurrentNote);
+}
+
+// Event delegation for clicking on a note in the list
+if (DOMElements.notesList) {
+  DOMElements.notesList.addEventListener('click', handleNoteListClick);
 }
 
 // ===== API & CORE FUNCTIONS =====
