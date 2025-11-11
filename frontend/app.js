@@ -106,7 +106,7 @@ const BIBLE_DATA = {
 
 // ===== CONFIGURATION =====
 const API_URL = window.location.hostname === 'localhost'
-    ? 'http://localhost:3000/api' // Local development
+    ? 'https://scribe-study.vercel.app/api' // Use deployed backend while testing locally
     : '/api'; // Production (same domain)
 
 // --- Firebase Configuration ---
