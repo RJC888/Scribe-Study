@@ -1619,3 +1619,5 @@ function updateNoteEditorUI() {
     // Delete button is enabled only if a note is loaded
     DOMElements.deleteNoteBtn.disabled = !AppState.currentNoteId;
 }
+    
+}
