@@ -636,7 +636,9 @@ function initializeAppListeners() {
 
     // --- Notes Functionality Listeners ---
     DOMElements.newNoteBtn.addEventListener('click', createNewNote);
-    DOMElements.saveNoteBtn.addEventListener('click', saveCurrentNote);
+    if (DOMElements.saveNoteBtn) {
+  DOMElements.saveNoteBtn.addEventListener('click', saveCurrentNote);
+}
     DOMElements.deleteNoteBtn.addEventListener('click', deleteCurrentNote);
 
     // Event delegation for clicking on a note in the list
