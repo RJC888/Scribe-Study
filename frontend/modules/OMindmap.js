@@ -1,5 +1,6 @@
 // frontend/modules/OMindmap.js
 import { saveReflection } from "../formationEngine.js";
+import { showReflectionModal } from "./ReflectionModal.js";
 
 const nodes = [
   { id: "root", label: "I am the vine", relation: null },
@@ -64,21 +65,31 @@ export function renderMindmap({
     el.style.top = `${y}px`;
     el.title = `Relation: ${node.relation}`;
 
-    el.addEventListener("click", async () => {
-      const response = window.prompt(`Reflect: How does "${node.label}" connect to your life?`);
-      if (response) {
-        await saveReflection({
-          passage,
-          module: "OMindmap",
-          visualizationType: "ConceptualMap",
-          prompt: `How does "${node.label}" connect to your life?`,
-          response,
-          theme,
-          tags: ["mindmap", node.relation].filter(Boolean),
-        });
-        alert("Reflection saved!");
-      }
-    });
+    // When a user clicks a node on the mindmap...
+el.addEventListener("click", () => {
+  // Step 1: Prepare the reflection question
+  const promptText = `How does "${node.label}" connect to your life?`;
+
+  // Step 2: Open the Reflection Modal (from ReflectionModal.js)
+  showReflectionModal({
+    promptText, // text shown in the modal
+    onSave: async (response) => {
+      // Step 3: Save the reflection (to Firestore or localStorage)
+      await saveReflection({
+        passage,
+        module: "OMindmap",
+        visualizationType: "ConceptualMap",
+        prompt: promptText,
+        response,
+        theme,
+        tags: ["mindmap", node.relation].filter(Boolean),
+      });
+
+      // Step 4: Let the user know it worked
+      alert("Reflection saved!");
+    },
+  });
+});
 
     container.appendChild(el);
   });
