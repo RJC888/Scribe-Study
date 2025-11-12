@@ -217,21 +217,73 @@ async function initializeFirebaseAndAuth() {
           .collection("users")
           .doc(user.uid)
           .collection("notes");
+// ✅ FIREBASE INIT + AUTH (COMPAT VERSION)
+// ============================
+function initFirebaseOnce() {
+  try {
+    const config = loadFirebaseConfig();
+    if (!config) throw new Error("Missing Firebase config.");
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(config);
+      console.log("✅ Firebase initialized (compat)");
+    } else {
+      console.log("ℹ️ Firebase already initialized");
+    }
+  } catch (e) {
+    console.error("Error initializing Firebase:", e);
+    setErrorState("Failed to initialize Firebase. Check your config and console.");
+  }
+}
+
+async function initializeFirebaseAndAuth() {
+  try {
+    console.log("Initializing Firebase...");
+    initFirebaseOnce();
+
+    const app = firebase.app();
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    AppState.app = app;
+    AppState.auth = auth;
+    AppState.db = db;
+
+    // Enable persistence if available
+    try {
+      await firebase.firestore().enablePersistence({ synchronizeTabs: true });
+      console.log("✅ Firestore persistence enabled");
+    } catch (err) {
+      console.warn("⚠️ Persistence not available:", err.message);
+    }
+
+    // Auth state handling
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        console.log(`👤 Logged in as ${user.uid}`);
+        AppState.user = user;
+
+        // Create Firestore ref for user's notes
+        AppState.notesCollectionRef = db
+          .collection("users")
+          .doc(user.uid)
+          .collection("notes");
 
         // Load and render
         await loadNotesFromFirestore();
         renderNotes();
-
       } else {
         console.log("🚫 No user signed in");
         AppState.user = null;
       }
     });
 
+    console.log("✅ Firebase Auth & Firestore ready (compat)");
   } catch (err) {
     console.error("🔥 Firebase init error:", err);
   }
 }
+
     console.log("✅ Firebase Auth & Firestore ready (compat)");
   } catch (e) {
     console.error("Error initializing Firebase:", e);
