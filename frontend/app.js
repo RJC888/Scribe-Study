@@ -1,25 +1,4 @@
 // ===== FIREBASE IMPORTS (v10.13.0 to match index.html) =====
-import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import {
-  getAuth,
-  signInAnonymously,
-  signInWithCustomToken,
-  onAuthStateChanged,
-  setPersistence,
-  browserLocalPersistence
-} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  doc,
-  deleteDoc,
-  setDoc,
-  onSnapshot,
-  query,
-  serverTimestamp,
-  setLogLevel
-} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 // ===== CONFIG PICKUP (robust) =====
 // 1) Prefer a JSON string __firebase_config (legacy style)
@@ -34,6 +13,11 @@ const DEFAULT_CONFIG = {
   appId: "1:133274919715:web:c48490a98e28db93a9a2296",
   measurementId: "G-GWXZ67WB98",
 };
+
+// ===== INITIALIZE FIREBASE (use global config from index.html) =====
+const firebaseConfig = window.firebaseConfig || DEFAULT_CONFIG;
+initializeApp(firebaseConfig);
+console.log("✅ Firebase initialized successfully");
 
 function loadFirebaseConfig() {
   try {
