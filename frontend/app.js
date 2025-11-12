@@ -33,7 +33,7 @@ function loadFirebaseConfig() {
 let app;
 try {
   const config = loadFirebaseConfig();
-  app = initializeApp(config);
+  app = firebase.initializeApp(config);
   console.log("✅ Firebase initialized successfully");
 } catch (err) {
   console.error("❌ Firebase initialization failed:", err);
@@ -43,8 +43,8 @@ try {
 // Only initialize Auth and Firestore after app exists
 let auth, db;
 if (app) {
-  auth = getAuth(app);
-  db = getFirestore(app);
+  auth = firebase.auth();
+  db = firebase.firestore();
   console.log("✅ Firebase Auth & Firestore initialized");
 } else {
   console.warn("⚠️ Skipped Auth/DB init — Firebase app not available yet.");
