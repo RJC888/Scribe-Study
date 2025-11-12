@@ -35,6 +35,15 @@ if (app) {
   console.warn("⚠️ Skipped Auth/DB init — Firebase app not available yet.");
 }
 
+// --- TEMP FIX: prevent ModuleDefinitions crash ---
+const ModuleDefinitions = {
+  Devotional: { modules: [] },
+  TextAnalysis: { modules: [] },
+  Context: { modules: [] },
+  JewishBackground: { modules: [] },
+  Teaching: { modules: [] }
+};
+
 // ===== API CONFIG =====
 const API_URL =
   window.location.hostname === "localhost"
