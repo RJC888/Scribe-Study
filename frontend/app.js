@@ -881,16 +881,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // ----------------------
-// BIBLE DATA PROCESSING
-function processBibleData() {
-  const allBooks = [...BIBLE_DATA.testament.old.books, ...BIBLE_DATA.testament.new.books];
-  allBooks.forEach((book, index) => {
-    // (optional) populate dropdowns or internal maps here
-  });
-  console.log("✅ Bible data processed:", allBooks.length, "books loaded.");
-}
-
-// ----------------------
 // BASIC UI INITIALIZER  (temporary fallback)
 function initApp() {
   console.log("✅ UI initialized manually (temporary fallback)");
