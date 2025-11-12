@@ -1,0 +1,56 @@
+.module-btn {
+  display: block;
+  margin: 4px 0;
+  padding: 8px;
+  border: none;
+  border-radius: 6px;
+  background: #f2f2f2;
+  cursor: pointer;
+}
+
+.tag-chip {
+  display: inline-block;
+  margin: 4px;
+  padding: 6px 10px;
+  border-radius: 12px;
+  background: #e0e0e0;
+  cursor: pointer;
+}
+
+.tag-chip.selected {
+  background: #4a665a;
+  color: #fff;
+}
+
+.renderer-status {
+  margin: 12px 0;
+  font-style: italic;
+  color: #666;
+}
+
+.mindmap-placeholder {
+  position: relative;
+  min-height: 300px;
+  border: 1px dashed #bbb;
+  border-radius: 10px;
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+.mindmap-center {
+  background: #4a665a;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+}
+
+.mindmap-node {
+  background: #cfe5dc;
+  padding: 8px 12px;
+  border-radius: 16px;
+}
