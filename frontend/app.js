@@ -197,7 +197,7 @@ async function initializeFirebaseAndAuth() {
       console.warn("⚠️ Persistence not available:", err.message);
     }
 
-    // Auth state handling
+      // Auth state handling
     auth.onAuthStateChanged(async (user) => {
       if (user) {
         AppState.userId = user.uid;
