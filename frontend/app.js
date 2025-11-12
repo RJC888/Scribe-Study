@@ -284,12 +284,6 @@ async function initializeFirebaseAndAuth() {
   }
 }
 
-    console.log("✅ Firebase Auth & Firestore ready (compat)");
-  } catch (e) {
-    console.error("Error initializing Firebase:", e);
-    setErrorState("Failed to initialize Firebase. Check your config and console.");
-  }
-
 // ===== FULL BIBLE STRUCTURE DATA =====
 const BIBLE_DATA = {
   testament: {
