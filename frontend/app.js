@@ -582,10 +582,6 @@ function resizeNotes(size) {
   }
 }
 
-// ----------------------
-// MODULES (kept minimal: plug in your ModuleDefinitions here)
-const ModuleDefinitions = { /* -- paste your ModuleDefinitions object here unchanged -- */ };
-
 function getModuleInfo(category, module) {
   if (ModuleDefinitions[category]?.modules?.[module]) return ModuleDefinitions[category].modules[module];
   if (ModuleDefinitions[category]) {
