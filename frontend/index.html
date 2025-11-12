@@ -108,3 +108,18 @@
         <div id="mindmap"></div>
 
       </div>       <!-- closes results-main -->
+      </main>      <!-- closes content-area -->
+
+</div> <!-- closes main-container (if you have one wrapping everything) -->
+
+<!-- ✅ Visualization Modules -->
+<script type="module" src="./formationEngine.js" defer></script>
+<script type="module" src="./modules/OMindmap.js" defer></script>
+<script type="module">
+  import { renderMindmap } from "./modules/OMindmap.js";
+  renderMindmap();
+</script>
+
+</body>
+</html>
+
