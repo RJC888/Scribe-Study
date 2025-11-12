@@ -206,6 +206,32 @@ async function initializeFirebaseAndAuth() {
       console.warn("⚠️ Persistence not available:", err.message);
     }
 
+        // Auth state handling
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        console.log(`👤 Logged in as ${user.uid}`);
+        AppState.user = user;
+
+        // Create Firestore ref for user's notes
+        AppState.notesCollectionRef = db
+          .collection("users")
+          .doc(user.uid)
+          .collection("notes");
+
+        // Load and render
+        await loadNotesFromFirestore();
+        renderNotes();
+      } else {
+        console.log("🚫 No user signed in");
+        AppState.user = null;
+      }
+    });
+
+  } catch (err) {
+    console.error("🔥 Firebase init error:", err);
+  }
+}
+
       // Auth state handling
     auth.onAuthStateChanged(async (user) => {
       if (user) {
