@@ -29,10 +29,26 @@ function loadFirebaseConfig() {
   return DEFAULT_CONFIG;
 }
 
-// ===== INITIALIZE FIREBASE (use config from index.html or fallback) =====
-const firebaseConfig = loadFirebaseConfig();
-initializeApp(firebaseConfig);
-console.log("✅ Firebase initialized successfully");
+// ===== INITIALIZE FIREBASE (safe + synced with index.html) =====
+let app;
+try {
+  const config = loadFirebaseConfig();
+  app = initializeApp(config);
+  console.log("✅ Firebase initialized successfully");
+} catch (err) {
+  console.error("❌ Firebase initialization failed:", err);
+  setErrorState("Failed to initialize Firebase config.");
+}
+
+// Only initialize Auth and Firestore after app exists
+let auth, db;
+if (app) {
+  auth = getAuth(app);
+  db = getFirestore(app);
+  console.log("✅ Firebase Auth & Firestore initialized");
+} else {
+  console.warn("⚠️ Skipped Auth/DB init — Firebase app not available yet.");
+}
 
 // ===== API CONFIG =====
 const API_URL =
