@@ -1,24 +1,17 @@
 // ===== FIREBASE IMPORTS (v10.13.0 to match index.html) =====
 
 // ===== CONFIG PICKUP (robust) =====
-// 1) Prefer a JSON string __firebase_config (legacy style)
-// 2) Else prefer window/globalThis.firebaseConfig (from <head>)
-// 3) Else fall back to your known-good config so the app still boots
 const DEFAULT_CONFIG = {
   apiKey: "AIzaSyD1TJ4GTW7bjJNx5Z4SBEMfujTSaD3FWzY",
   authDomain: "scribe-study.firebaseapp.com",
   projectId: "scribe-study",
   storageBucket: "scribe-study.appspot.com",
   messagingSenderId: "133274919715",
-  appId: "1:133274919715:web:c48490a98e28db93a9a2296",
-  measurementId: "G-GWXZ67WB98",
+  appId: "1:133274919715:web:c48490a98e28db939a2296",
+  measurementId: "G-GWXZ67WB98"
 };
 
-// ===== INITIALIZE FIREBASE (use global config from index.html) =====
-const firebaseConfig = window.firebaseConfig || DEFAULT_CONFIG;
-initializeApp(firebaseConfig);
-console.log("✅ Firebase initialized successfully");
-
+// ===== LOAD FIREBASE CONFIG (robust fallback chain) =====
 function loadFirebaseConfig() {
   try {
     if (globalThis.__firebase_config) {
@@ -27,12 +20,19 @@ function loadFirebaseConfig() {
   } catch (e) {
     console.warn("Failed to parse __firebase_config JSON:", e);
   }
+
   if (globalThis.firebaseConfig) return globalThis.firebaseConfig;
-  console.warn("⚠️ Using DEFAULT Firebase config (consider exposing window.firebaseConfig in <head>)");
+
+  console.warn(
+    "⚠️ Using DEFAULT Firebase config (consider exposing window.firebaseConfig in <head>)"
+  );
   return DEFAULT_CONFIG;
 }
 
+// ===== INITIALIZE FIREBASE (use config from index.html or fallback) =====
 const firebaseConfig = loadFirebaseConfig();
+initializeApp(firebaseConfig);
+console.log("✅ Firebase initialized successfully");
 
 // ===== API CONFIG =====
 const API_URL =
