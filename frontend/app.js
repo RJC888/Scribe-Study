@@ -232,22 +232,6 @@ async function initializeFirebaseAndAuth() {
   }
 }
 
-      // Auth state handling
-    auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        AppState.userId = user.uid;
-        const appId = (typeof globalThis.__app_id !== "undefined") ? globalThis.__app_id : "default-app-id";
-        const collectionPath = `/artifacts/${appId}/users/${AppState.userId}/notes`;
-        AppState.notesCollectionRef = db.collection(collectionPath);
-        loadNotesFromFirestore();
-        setReadyState("Ready to Study God's Word", "Enter a scripture passage or question, then choose an action.");
-      } else {
-        AppState.userId = null;
-        if (AppState.notesUnsubscribe) {
-          AppState.notesUnsubscribe();
-          AppState.notesUnsubscribe = null;
-        }
-
         try {
           if (globalThis.__initial_auth_token) {
             await auth.signInWithCustomToken(globalThis.__initial_auth_token);
