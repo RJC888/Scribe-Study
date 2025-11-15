@@ -21,16 +21,30 @@ jobs:
       with:
         node-version: 18
 
-    - name: Install dependencies
+    - name: Install root dependencies
       run: npm install
+
+    - name: Install backend dependencies
+      run: npm run install-backend
 
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
 
+    # 🔥 Start backend dev server FIRST
+    - name: Start backend server
+      run: npm run dev &
+      env:
+        NODE_ENV: test
+
+    # 🕒 Allow backend to start up
+    - name: Wait for server to be ready
+      run: npx wait-on http://localhost:3000
+
+    # 🧪 Now run Playwright tests
     - name: Run Playwright Tests
       run: npx playwright test
-      continue-on-error: false
 
+    # 📦 Upload test artifacts
     - name: Upload Playwright Test Report
       if: always()
       uses: actions/upload-artifact@v4
@@ -39,7 +53,7 @@ jobs:
         path: playwright-report/
         retention-days: 30
 
-    - name: Upload Playwright Traces
+    - name: Upload Traces
       if: always()
       uses: actions/upload-artifact@v4
       with:
